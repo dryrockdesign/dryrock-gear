@@ -72,7 +72,7 @@ export async function onRequestGet({ request, env }) {
   return new Response(null, {
     status: 302,
     headers: {
-      Location: `${url.origin}/app`,
+      Location: `${url.origin}/tools/spur-gear`,
       "Set-Cookie": setCookieHeader("session", session, 60 * 60 * 24 * 7),
     },
   });

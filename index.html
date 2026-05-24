@@ -1,22 +1,309 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Dryrock Design — Polymer Gear Studio</title>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dryrock Design Tools — Engineering design tools for makers</title>
+<meta name="description" content="Engineering design tools for makers. Polymer gear design, shaft analysis and more — built on real engineering standards, made simple.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-body{margin:0;font-family:system-ui,sans-serif;background:#0e1014;color:#e9e7e0;
-  display:grid;place-items:center;height:100vh;text-align:center}
-.card{max-width:440px;padding:40px}
-h1{font-size:30px;margin:0 0 6px} h1 b{color:#ff9e3d}
-p{color:#888f9d;line-height:1.6}
-a.btn{display:inline-block;margin-top:22px;padding:14px 26px;background:#ff9e3d;color:#1a1206;
-  text-decoration:none;border-radius:8px;font-weight:700;letter-spacing:.5px}
-a.alt{display:block;margin-top:14px;color:#5fb0d4;font-size:13px}
-small{display:block;margin-top:28px;color:#555c68;font-size:11px;line-height:1.5}
-</style></head><body>
-<div class="card">
-  <h1>DRYROCK<b>·</b>DESIGN</h1>
-  <p>Polymer Gear Design Studio — members-only access via Patreon.</p>
-  <a class="btn" href="/api/login">Sign in with Patreon</a>
-  <a class="alt" href="https://www.patreon.com/YOUR_CAMPAIGN" target="_blank">Not a member yet? Join here →</a>
-  <small>© 2026 Dryrock Design. All rights reserved. No copying, redistribution,
-  or sharing with third parties / organisations.</small>
-</div></body></html>
+  :root{
+    --ink:#1a1c1f; --ink-soft:#4a4f57; --ink-faint:#878d97;
+    --paper:#f4f1ea; --paper-2:#ece8df; --card:#fbfaf6;
+    --line:#d9d4c8; --line-soft:#e6e2d8;
+    --rust:#b4541f; --rust-soft:#c9743e; --blueprint:#2e5266; --ok:#3f7d52;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--paper);color:var(--ink);
+    font-family:'IBM Plex Sans',sans-serif;font-weight:400;line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+    background-image:linear-gradient(rgba(46,82,102,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(46,82,102,.035) 1px,transparent 1px);
+    background-size:28px 28px;
+  }
+  .wrap{max-width:1080px;margin:0 auto;padding:0 28px}
+  header{border-bottom:1px solid var(--line);background:rgba(244,241,234,.85);backdrop-filter:blur(8px);position:sticky;top:0;z-index:50}
+  .nav{display:flex;align-items:center;justify-content:space-between;height:68px}
+  .brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--ink)}
+  .logo-img{height:44px;width:auto;display:block}
+  .brand-text{font-family:'Spectral',serif;font-weight:600;font-size:18px;letter-spacing:.2px;line-height:1}
+  .brand-text small{display:block;font-family:'IBM Plex Mono',monospace;font-weight:400;font-size:9.5px;letter-spacing:2.5px;text-transform:uppercase;color:var(--ink-faint);margin-top:3px}
+  .nav-links{display:flex;align-items:center;gap:28px}
+  .nav-links a{color:var(--ink-soft);text-decoration:none;font-size:14px;font-weight:500;transition:color .15s}
+  .nav-links a:hover{color:var(--rust)}
+  .nav-cta{background:var(--ink);color:var(--paper);padding:9px 18px;border-radius:3px;font-size:13px;font-weight:500;letter-spacing:.3px;transition:background .15s}
+  .nav-cta:hover{background:var(--rust)!important;color:#fff!important}
+  .hero{padding:78px 0 64px;position:relative}
+  .hero .eyebrow{font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:3px;text-transform:uppercase;color:var(--rust);margin-bottom:22px;display:flex;align-items:center;gap:12px}
+  .hero .eyebrow::before{content:"";width:36px;height:1px;background:var(--rust)}
+  .hero h1{font-family:'Spectral',serif;font-weight:600;font-size:clamp(38px,6vw,62px);line-height:1.08;letter-spacing:-.5px;max-width:16ch;margin-bottom:24px}
+  .hero h1 em{font-style:italic;color:var(--rust);font-weight:500}
+  .hero .lead{font-size:18px;color:var(--ink-soft);max-width:54ch;font-weight:300;line-height:1.7}
+  .hero-actions{display:flex;gap:14px;margin-top:36px;flex-wrap:wrap}
+  .btn{font-family:'IBM Plex Sans',sans-serif;font-size:15px;font-weight:500;padding:14px 28px;border-radius:3px;text-decoration:none;cursor:pointer;border:1px solid transparent;transition:all .15s;letter-spacing:.2px}
+  .btn-primary{background:var(--rust);color:#fff}
+  .btn-primary:hover{background:#9c4619;transform:translateY(-1px)}
+  .btn-ghost{background:transparent;color:var(--ink);border-color:var(--line)}
+  .btn-ghost:hover{border-color:var(--ink);background:var(--card)}
+  .hero-deco{position:absolute;top:24px;right:-30px;width:300px;height:300px;opacity:.08;pointer-events:none}
+  section{padding:64px 0}
+  .sec-head{margin-bottom:40px;max-width:62ch}
+  .sec-head .label{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--ink-faint);margin-bottom:14px}
+  .sec-head h2{font-family:'Spectral',serif;font-weight:600;font-size:32px;letter-spacing:-.3px;margin-bottom:12px}
+  .sec-head p{color:var(--ink-soft);font-size:16px;font-weight:300}
+  .divider{border:none;border-top:1px solid var(--line);margin:0}
+  .tools-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:22px}
+  .tool-card{background:var(--card);border:1px solid var(--line);border-radius:6px;overflow:hidden;display:flex;flex-direction:column;transition:border-color .2s,transform .2s,box-shadow .2s;position:relative}
+  .tool-card.live:hover{border-color:var(--rust);transform:translateY(-3px);box-shadow:0 14px 34px rgba(26,28,31,.09)}
+  .tool-card .thumb{height:150px;background:var(--blueprint);position:relative;overflow:hidden;display:grid;place-items:center}
+  .tool-card .thumb svg{width:100%;height:100%;display:block}
+  .tool-card .body{padding:22px 22px 24px;display:flex;flex-direction:column;flex:1}
+  .tool-card .tag{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--rust);margin-bottom:9px}
+  .tool-card h3{font-family:'Spectral',serif;font-weight:600;font-size:21px;margin-bottom:9px;letter-spacing:-.2px}
+  .tool-card p{color:var(--ink-soft);font-size:14px;font-weight:300;line-height:1.6;flex:1;margin-bottom:18px}
+  .tool-card .card-foot{display:flex;align-items:center;justify-content:space-between}
+  .tool-card .launch{font-family:'IBM Plex Sans',sans-serif;font-size:14px;font-weight:500;color:var(--paper);background:var(--ink);padding:10px 20px;border-radius:3px;text-decoration:none;transition:background .15s;border:none;cursor:pointer}
+  .tool-card .launch:hover{background:var(--rust)}
+  .tool-card .lock{font-size:11px;color:var(--ink-faint);font-family:'IBM Plex Mono',monospace;letter-spacing:.5px}
+  .badge-soon{position:absolute;top:14px;right:14px;background:rgba(26,28,31,.82);color:var(--paper);font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;padding:4px 9px;border-radius:3px;z-index:2}
+  .tool-card.soon{opacity:.72}
+  .tool-card.soon .launch{background:var(--line);color:var(--ink-faint);cursor:not-allowed;pointer-events:none}
+  .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:28px}
+  .step{position:relative;padding-top:18px;border-top:2px solid var(--ink)}
+  .step .num{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--rust);letter-spacing:2px;margin-bottom:10px}
+  .step h4{font-family:'Spectral',serif;font-weight:600;font-size:18px;margin-bottom:8px}
+  .step p{color:var(--ink-soft);font-size:14px;font-weight:300}
+  .video-frame{border:1px solid var(--line);border-radius:6px;background:var(--paper-2);aspect-ratio:16/9;display:grid;place-items:center;position:relative;overflow:hidden}
+  .video-frame::before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(46,82,102,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(46,82,102,.05) 1px,transparent 1px);background-size:22px 22px}
+  .video-ph{text-align:center;position:relative;z-index:1}
+  .video-ph .play{width:64px;height:64px;border-radius:50%;border:2px solid var(--ink-faint);display:grid;place-items:center;margin:0 auto 16px;color:var(--ink-faint)}
+  .video-ph .play svg{width:22px;height:22px;margin-left:3px}
+  .video-ph p{font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--ink-faint)}
+  .join{background:var(--ink);color:var(--paper);border-radius:8px;padding:54px 48px;text-align:center;position:relative;overflow:hidden}
+  .join::before{content:"";position:absolute;inset:0;opacity:.06;background-image:linear-gradient(#fff 1px,transparent 1px),linear-gradient(90deg,#fff 1px,transparent 1px);background-size:30px 30px}
+  .join h2{font-family:'Spectral',serif;font-weight:600;font-size:30px;margin-bottom:14px;position:relative}
+  .join p{color:#c9c5bc;font-weight:300;max-width:50ch;margin:0 auto 28px;position:relative}
+  .join .btn-primary{position:relative}
+  .join .note{margin-top:18px;font-size:12.5px;color:#8b9099;font-family:'IBM Plex Mono',monospace;letter-spacing:.5px;position:relative}
+  footer{border-top:1px solid var(--line);padding:40px 0;margin-top:20px}
+  .foot-grid{display:flex;justify-content:space-between;align-items:flex-start;gap:30px;flex-wrap:wrap}
+  .foot-brand{font-family:'Spectral',serif;font-weight:600;font-size:16px}
+  .foot-brand small{display:block;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--ink-faint);margin-top:6px;font-weight:400}
+  .foot-links{display:flex;gap:24px;flex-wrap:wrap}
+  .foot-links a{color:var(--ink-soft);text-decoration:none;font-size:13px}
+  .foot-links a:hover{color:var(--rust)}
+  .copyright{margin-top:28px;padding-top:22px;border-top:1px solid var(--line-soft);font-size:11.5px;color:var(--ink-faint);line-height:1.6}
+  @media(max-width:760px){
+    .nav-links a:not(.nav-cta){display:none}
+    .steps{grid-template-columns:1fr;gap:22px}
+    .hero{padding:54px 0 44px}.join{padding:40px 24px}.hero-deco{display:none}
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap nav">
+    <a class="brand" href="/">
+      <img class="logo-img" src="/assets/logo.png" alt="Dryrock Design">
+      <span class="brand-text">Dryrock Design<small>Engineering Tools</small></span>
+    </a>
+    <nav class="nav-links">
+      <a href="#tools">Tools</a>
+      <a href="#how">How it works</a>
+      <a href="#video">Guide</a>
+      <a class="nav-cta" href="/tools/spur-gear">Launch app &rarr;</a>
+    </nav>
+  </div>
+</header>
+
+<div class="hero">
+  <svg class="hero-deco" viewBox="0 0 200 200" fill="none" stroke="#1a1c1f" stroke-width="1.4">
+    <g transform="translate(100,100)">
+      <circle r="60"/><circle r="44"/><circle r="16"/>
+      <g stroke-width="1">
+        <line x1="-72" y1="0" x2="72" y2="0"/><line x1="0" y1="-72" x2="0" y2="72"/>
+        <line x1="-51" y1="-51" x2="51" y2="51"/><line x1="-51" y1="51" x2="51" y2="-51"/>
+      </g>
+    </g>
+  </svg>
+  <div class="wrap">
+    <div class="eyebrow">Engineering, made buildable</div>
+    <h1>Engineering design tools for <em>makers</em>.</h1>
+    <p class="lead">Real engineering standards, made simple. Design mechanical parts that actually work &mdash; verify them against the same methods professionals use, then export print-ready files. No engineering degree required.</p>
+    <div class="hero-actions">
+      <a class="btn btn-primary" href="/tools/spur-gear">Open Spur Gear Designer</a>
+      <a class="btn btn-ghost" href="#tools">Browse all tools</a>
+    </div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<section id="tools">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="label">The Toolbox</div>
+      <h2>Design tools, one membership</h2>
+      <p>Each tool turns a hard engineering calculation into a few sliders and a download button. Members get access to every tool &mdash; current and future.</p>
+    </div>
+    <div class="tools-grid">
+      <div class="tool-card live">
+        <div class="thumb">
+          <svg viewBox="0 0 320 150" preserveAspectRatio="xMidYMid meet">
+            <g transform="translate(150,75)" fill="none" stroke="#e8e3d6" stroke-width="1.6">
+              <circle r="44"/><circle r="13"/><circle r="52" stroke-dasharray="2 6"/>
+              <g stroke="#c9743e" stroke-width="2">
+                <line x1="0" y1="-52" x2="0" y2="-44"/><line x1="0" y1="44" x2="0" y2="52"/>
+                <line x1="-52" y1="0" x2="-44" y2="0"/><line x1="44" y1="0" x2="52" y2="0"/>
+                <line x1="-37" y1="-37" x2="-31" y2="-31"/><line x1="37" y1="37" x2="31" y2="31"/>
+                <line x1="-37" y1="37" x2="-31" y2="31"/><line x1="37" y1="-37" x2="31" y2="-31"/>
+              </g>
+            </g>
+            <g transform="translate(244,75)" fill="none" stroke="#9fb0bb" stroke-width="1.4">
+              <circle r="26"/><circle r="8"/>
+            </g>
+          </svg>
+        </div>
+        <div class="body">
+          <div class="tag">Live &middot; VDI 2736</div>
+          <h3>Spur Gear Designer</h3>
+          <p>Polymer spur gear designer &mdash; VDI 2736 based. Design, verify and export printable gears.</p>
+          <div class="card-foot">
+            <a class="launch" href="/tools/spur-gear">Launch &rarr;</a>
+            <span class="lock">&#128274; Members</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="tool-card soon">
+        <span class="badge-soon">Coming soon</span>
+        <div class="thumb">
+          <svg viewBox="0 0 320 150" preserveAspectRatio="xMidYMid meet">
+            <g transform="translate(160,75)" fill="none" stroke="#e8e3d6" stroke-width="1.4">
+              <ellipse rx="48" ry="34"/><ellipse rx="13" ry="9"/>
+              <line x1="-48" y1="-15" x2="48" y2="-15" stroke-dasharray="3 5"/>
+              <line x1="-48" y1="15" x2="48" y2="15" stroke-dasharray="3 5"/>
+            </g>
+          </svg>
+        </div>
+        <div class="body">
+          <div class="tag">Planned</div>
+          <h3>Helical Gear Designer</h3>
+          <p>Quieter, higher-load gears with helix-angle control and axial-thrust estimates. Next on the bench.</p>
+          <div class="card-foot">
+            <button class="launch">Soon</button>
+            <span class="lock">&#128274; Members</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="tool-card soon">
+        <span class="badge-soon">Coming soon</span>
+        <div class="thumb">
+          <svg viewBox="0 0 320 150" preserveAspectRatio="xMidYMid meet">
+            <g transform="translate(160,75)" fill="none" stroke="#e8e3d6" stroke-width="1.4">
+              <rect x="-72" y="-12" width="144" height="24" rx="3"/>
+              <rect x="-72" y="-18" width="22" height="36" rx="2"/>
+              <rect x="50" y="-16" width="22" height="32" rx="2"/>
+              <line x1="-82" y1="0" x2="82" y2="0" stroke="#c9743e" stroke-dasharray="2 5"/>
+            </g>
+          </svg>
+        </div>
+        <div class="body">
+          <div class="tag">Planned</div>
+          <h3>Shaft Designer</h3>
+          <p>Size shafts for torque, bending and fatigue &mdash; with keyways, fillets and a safety-factor check.</p>
+          <div class="card-foot">
+            <button class="launch">Soon</button>
+            <span class="lock">&#128274; Members</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<section id="how">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="label">How it works</div>
+      <h2>From idea to printable part in three steps</h2>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="num">STEP 01</div>
+        <h4>Set your parameters</h4>
+        <p>Enter what you know &mdash; load, speed, size, material. Plain inputs with clear explanations, no jargon you don't need.</p>
+      </div>
+      <div class="step">
+        <div class="num">STEP 02</div>
+        <h4>Verify the design</h4>
+        <p>The tool runs the real engineering checks (stress, safety factor, temperature) and tells you if your part will hold.</p>
+      </div>
+      <div class="step">
+        <div class="num">STEP 03</div>
+        <h4>Export &amp; print</h4>
+        <p>Download a clean STL for your 3D printer and a PDF engineering report documenting every result.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<section id="video">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="label">Watch the guide</div>
+      <h2>See a tool in action</h2>
+      <p>A short walkthrough of the Spur Gear Designer &mdash; from first slider to printed gear.</p>
+    </div>
+    <!-- VIDEO SLOT: replace .video-frame contents with a YouTube <iframe> when ready -->
+    <div class="video-frame">
+      <div class="video-ph">
+        <div class="play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div>
+        <p>Walkthrough coming soon</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="join">
+      <h2>Access every tool through Patreon</h2>
+      <p>One membership unlocks the full toolbox &mdash; and everything we build next. Sign in with your Patreon account to launch any tool.</p>
+      <a class="btn btn-primary" href="/tools/spur-gear">Sign in &amp; launch &rarr;</a>
+      <div class="note">Tip: subscribe on patreon.com in your browser to avoid the extra 30% Apple app fee.</div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div style="display:flex;align-items:center;gap:14px">
+        <img src="/assets/logo.png" alt="Dryrock Design" style="height:52px;width:auto;opacity:.9">
+        <div class="foot-brand">Dryrock Design<small>Engineering Tools</small></div>
+      </div>
+      <div class="foot-links">
+        <a href="#tools">Tools</a>
+        <a href="#how">How it works</a>
+        <a href="#video">Guide</a>
+        <a href="https://www.patreon.com/dryrockdesign" target="_blank" rel="noopener">Patreon</a>
+        <a href="mailto:dryrockdesign@gmail.com">Contact</a>
+      </div>
+    </div>
+    <div class="copyright">
+      &copy; 2026 Dryrock Design. All rights reserved. No copying, redistribution, reverse-engineering, or sharing with third parties / organisations without written permission.<br>
+      Designed for makers &amp; hobby projects &mdash; for serious or load-bearing applications, verify all results with independent engineering calculation and physical testing.
+    </div>
+  </div>
+</footer>
+</body>
+</html>

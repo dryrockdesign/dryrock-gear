@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dryrock Design — Polymer Gear Design Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+  :root{
+    --bg:#0e1014; --panel:#161922; --panel-2:#1c2029; --line:#2a2f3b;
+    --txt:#e9e7e0; --dim:#888f9d; --amber:#ff9e3d; --amber-d:#5e3d18;
+    --steel:#5fb0d4; --good:#52c98a; --warn:#e8b94a; --bad:#e06a5a;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    background:var(--bg);color:var(--txt);font-family:'JetBrains Mono',monospace;
+    overflow:hidden;font-size:13px;
+    background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);
+    background-size:36px 36px;
+  }
+  #app{display:flex;flex-direction:column;height:100vh}
+  #topbar{display:flex;align-items:center;gap:18px;padding:12px 22px;background:var(--panel);border-bottom:1px solid var(--line);flex-shrink:0;z-index:5;flex-wrap:wrap}
+  .logo{line-height:1}
+  .logo h1{font-family:'Archivo',sans-serif;font-weight:900;font-size:20px;letter-spacing:.5px}
+  .logo h1 b{color:var(--amber)}
+  .logo p{font-size:10px;color:var(--dim);letter-spacing:2px;text-transform:uppercase;margin-top:3px}
+  .seg{display:flex;background:var(--panel-2);border:1px solid var(--line);border-radius:6px;overflow:hidden}
+  .seg button{padding:8px 15px;background:none;border:none;color:var(--dim);font-family:'JetBrains Mono';font-size:12px;cursor:pointer;letter-spacing:.5px;transition:.15s}
+  .seg button.on{background:var(--amber);color:#1a1206;font-weight:700}
+  .seg.tabs button.on{background:var(--panel);color:var(--amber);border-bottom:2px solid var(--amber)}
+  .topbar-label{font-size:10px;color:var(--dim);text-transform:uppercase;letter-spacing:1.5px;margin-right:-10px}
+  .spacer{flex:1}
+  .mini{padding:7px 11px;background:var(--panel-2);border:1px solid var(--line);color:var(--dim);border-radius:5px;cursor:pointer;font-family:'JetBrains Mono';font-size:11px;letter-spacing:.5px;transition:.15s}
+  .mini:hover{border-color:var(--amber);color:var(--amber)}
+  #main{flex:1;display:flex;overflow:hidden}
+  .hidden{display:none !important}
+  #controls{width:320px;flex-shrink:0;background:var(--panel);border-right:1px solid var(--line);overflow-y:auto;padding:8px 18px 30px}
+  #controls::-webkit-scrollbar,#results::-webkit-scrollbar,#guide::-webkit-scrollbar,#contact::-webkit-scrollbar{width:8px}
+  #controls::-webkit-scrollbar-thumb,#results::-webkit-scrollbar-thumb,#guide::-webkit-scrollbar-thumb,#contact::-webkit-scrollbar-thumb{background:var(--line);border-radius:4px}
+  .sec{margin-top:18px;padding-top:14px;border-top:1px solid var(--line)}
+  .sec:first-child{border-top:none}
+  .sec-title{font-size:10px;color:var(--amber);letter-spacing:2.5px;text-transform:uppercase;margin-bottom:4px;font-weight:700}
+  .field{margin-top:13px}
+  .field-row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:5px}
+  .field label{font-size:11px;letter-spacing:.8px;color:var(--txt)}
+  .field .val{font-size:12px;font-weight:700;color:var(--amber);background:var(--panel-2);padding:2px 8px;border-radius:3px;min-width:50px;text-align:right}
+  .field .desc{font-size:10px;color:var(--dim);line-height:1.4;margin-top:3px}
+  input[type=range]{-webkit-appearance:none;width:100%;height:4px;border-radius:2px;background:var(--line);outline:none}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:15px;height:15px;border-radius:50%;background:var(--amber);cursor:pointer;border:3px solid var(--bg);box-shadow:0 0 0 1px var(--amber)}
+  input[type=range]::-moz-range-thumb{width:15px;height:15px;border-radius:50%;background:var(--amber);cursor:pointer;border:3px solid var(--bg)}
+  input[type=number],select{width:100%;background:var(--panel-2);border:1px solid var(--line);color:var(--txt);padding:7px 9px;border-radius:5px;font-family:'JetBrains Mono';font-size:12px;outline:none}
+  input[type=number]:focus,select:focus{border-color:var(--amber)}
+  .adv{display:none}
+  body.advanced .adv{display:block}
+  .badge-adv{font-size:8px;background:var(--steel);color:#06222e;padding:1px 5px;border-radius:3px;letter-spacing:1px;margin-left:6px;vertical-align:middle;font-weight:700}
+  .opt-btn{width:100%;margin-top:12px;padding:11px;background:linear-gradient(90deg,var(--steel),#4a93b5);border:none;border-radius:6px;color:#06222e;font-family:'Archivo';font-weight:700;font-size:12px;letter-spacing:1px;text-transform:uppercase;cursor:pointer;transition:.15s}
+  .opt-btn:hover{filter:brightness(1.1)}
+  .opt-out{font-size:10px;color:var(--steel);margin-top:8px;line-height:1.5;background:rgba(95,176,212,.08);padding:8px 10px;border-radius:5px;border-left:2px solid var(--steel);display:none}
+  #viewport{flex:1;position:relative;min-width:0}
+  #canvas{display:block;width:100%;height:100%}
+  #watermark{position:absolute;bottom:16px;right:20px;font-family:'Archivo';font-weight:900;font-size:13px;color:rgba(255,158,61,.35);letter-spacing:1px;pointer-events:none}
+  #vp-hint{position:absolute;top:16px;left:20px;font-size:10px;color:var(--dim);letter-spacing:1px}
+  #legend{position:absolute;top:16px;right:20px;font-size:10px;color:var(--dim);text-align:right;line-height:1.7;display:none}
+  #legend b{font-weight:700}
+  #vp-actions{position:absolute;bottom:16px;left:20px;display:flex;gap:10px;flex-wrap:wrap;max-width:70%}
+  .vbtn{padding:11px 16px;border:none;border-radius:6px;cursor:pointer;font-family:'Archivo';font-weight:700;font-size:12px;letter-spacing:1px;text-transform:uppercase;transition:.15s}
+  .vbtn.stl{background:var(--amber);color:#1a1206;box-shadow:0 6px 18px rgba(255,158,61,.25)}
+  .vbtn.pdf{background:var(--panel-2);color:var(--steel);border:1px solid var(--steel)}
+  .vbtn.anim{background:var(--panel-2);color:var(--txt);border:1px solid var(--line)}
+  .vbtn:hover{transform:translateY(-1px)}
+  #results{width:330px;flex-shrink:0;background:var(--panel);border-left:1px solid var(--line);overflow-y:auto;padding:16px 18px 30px}
+  .r-sec{margin-bottom:18px}
+  .r-title{font-size:10px;color:var(--dim);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+  .r-title::after{content:"";flex:1;height:1px;background:var(--line)}
+  .r-row{display:flex;justify-content:space-between;font-size:12px;padding:3px 0}
+  .r-row span:first-child{color:var(--dim)}
+  .r-row span:last-child{color:var(--txt);font-weight:500}
+  .verdict{padding:11px 14px;border-radius:7px;margin-bottom:8px;border:1px solid}
+  .verdict h4{font-size:11px;letter-spacing:1px;text-transform:uppercase;margin-bottom:5px;display:flex;justify-content:space-between}
+  .verdict .big{font-family:'Archivo';font-weight:900;font-size:20px}
+  .verdict.ok{border-color:var(--good);background:rgba(82,201,138,.07)}
+  .verdict.ok .big,.verdict.ok h4 .sf{color:var(--good)}
+  .verdict.mid{border-color:var(--warn);background:rgba(232,185,74,.07)}
+  .verdict.mid .big,.verdict.mid h4 .sf{color:var(--warn)}
+  .verdict.no{border-color:var(--bad);background:rgba(224,106,90,.07)}
+  .verdict.no .big,.verdict.no h4 .sf{color:var(--bad)}
+  .verdict .sub{font-size:10px;color:var(--dim);margin-top:4px;line-height:1.4}
+  #warnings .warn-item{font-size:11px;color:var(--warn);padding:6px 9px;background:rgba(232,185,74,.08);border-left:2px solid var(--warn);border-radius:3px;margin-top:6px;line-height:1.4}
+  #guide,#contact{flex:1;overflow-y:auto;padding:40px 60px}
+  #guide .g-wrap,#contact .c-wrap{max-width:820px;margin:0 auto}
+  #guide h2,#contact h2{font-family:'Archivo';font-weight:900;font-size:26px;margin-bottom:6px}
+  #guide .g-sub,#contact .c-sub{color:var(--amber);font-size:11px;letter-spacing:2px;text-transform:uppercase;margin-bottom:24px}
+  #guide h3{font-family:'Archivo';font-weight:700;font-size:16px;color:var(--amber);margin:28px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--line)}
+  #guide p,#contact p{line-height:1.7;color:#cbd0da;margin-bottom:12px;font-size:13px}
+  #guide code{background:var(--panel-2);padding:2px 6px;border-radius:3px;color:var(--steel);font-size:12px}
+  #guide .gtab{width:100%;border-collapse:collapse;margin:12px 0;font-size:12px}
+  #guide .gtab td,#guide .gtab th{border:1px solid var(--line);padding:7px 10px;text-align:left}
+  #guide .gtab th{background:var(--panel-2);color:var(--amber);font-weight:700}
+  #guide .gtab td:first-child{color:var(--steel);font-weight:500}
+  #guide .note,#contact .note{background:rgba(232,185,74,.07);border-left:3px solid var(--warn);padding:12px 16px;border-radius:4px;margin:16px 0;font-size:12px;line-height:1.6}
+  .contact-card{background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:28px 32px;margin-top:18px}
+  .contact-card a{color:var(--amber);text-decoration:none;font-weight:700;font-size:18px}
+  .contact-card a:hover{text-decoration:underline}
+  .contact-card .em-label{font-size:10px;color:var(--dim);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px}
+  #footer{flex-shrink:0;padding:8px 22px;background:#0a0c10;border-top:1px solid var(--line);font-size:10px;color:var(--dim);display:flex;justify-content:space-between;gap:16px;line-height:1.5;flex-wrap:wrap}
+  #footer b{color:var(--amber)}
+  #footer a{color:var(--steel);text-decoration:none}
+  @media(max-width:1000px){#main{flex-direction:column;overflow-y:auto}#controls,#results{width:100%;border:none;border-bottom:1px solid var(--line)}#viewport{height:440px}}
+</style>
+</head>
+<body class="basic">
+<div id="app">
+  <div id="topbar">
+    <div class="logo"><h1>DRYROCK<b>·</b>DESIGN</h1><p>Polymer Gear Design Studio — VDI 2736</p></div>
+    <div class="spacer"></div>
+    <span class="topbar-label">Config</span>
+    <div class="seg" id="modeSeg"><button data-mode="single" class="on">Single</button><button data-mode="pair">Pair (ratio)</button></div>
+    <span class="topbar-label">Level</span>
+    <div class="seg" id="levelSeg"><button data-level="basic" class="on">Basic</button><button data-level="advanced">Advanced</button></div>
+    <button class="mini" id="saveCfg">Save ⤓</button>
+    <button class="mini" id="loadCfg">Load ⤒</button>
+    <input type="file" id="cfgFile" accept=".json" style="display:none">
+    <div class="seg tabs" id="tabSeg"><button data-tab="designer" class="on">Designer</button><button data-tab="guide">User Guide</button><button data-tab="contact">Contact</button></div>
+  </div>
+
+  <div id="main">
+    <!-- CONTROLS -->
+    <div id="controls" class="tab-designer">
+      <div class="sec">
+        <div class="sec-title">Gear Geometry</div>
+        <div class="field"><div class="field-row"><label>Module m</label><span class="val" id="v-module">2.0</span></div>
+          <input type="range" id="module" min="0.5" max="6" step="0.1" value="2">
+          <div class="desc">Tooth size index (mm). Pitch Ø = m·z. Larger module = stronger, coarser teeth. Plastic gears favour m ≥ 1.</div></div>
+        <div class="field"><div class="field-row"><label>Pinion teeth z₁</label><span class="val" id="v-teeth">18</span></div>
+          <input type="range" id="teeth" min="6" max="80" step="1" value="18">
+          <div class="desc">Tooth count of the driving (smaller) gear. Below ~17 (20° PA) undercut occurs — use positive profile shift.</div></div>
+        <div class="field pair-only"><div class="field-row"><label>Gear teeth z₂</label><span class="val" id="v-teeth2">54</span></div>
+          <input type="range" id="teeth2" min="6" max="200" step="1" value="54">
+          <div class="desc">Tooth count of the driven gear. Reduction ratio i = z₂ / z₁.</div></div>
+        <div class="field"><div class="field-row"><label>Face width b</label><span class="val" id="v-fw">12.0</span></div>
+          <input type="range" id="fw" min="2" max="40" step="0.5" value="12">
+          <div class="desc">Axial tooth length (mm). Wider face → lower stress. Typical b ≈ (6–12)·m.</div></div>
+        <div class="field"><div class="field-row"><label>Root fillet ρ (×m)</label><span class="val" id="v-fillet">0.38</span></div>
+          <input type="range" id="fillet" min="0" max="0.45" step="0.01" value="0.38">
+          <div class="desc">Root fillet radius as a fraction of module. Rounds the stress-concentrating root corner — critical for crack resistance in printed gears.</div></div>
+        <div class="field adv"><div class="field-row"><label>Pressure angle α <span class="badge-adv">ADV</span></label><span class="val" id="v-pa">20°</span></div>
+          <input type="range" id="pa" min="14.5" max="25" step="0.5" value="20">
+          <div class="desc">Reference profile angle. 20° is the de-facto standard. Higher α = stronger teeth, more radial load.</div></div>
+        <div class="field adv"><div class="field-row"><label>Profile shift x₁ <span class="badge-adv">ADV</span></label><span class="val" id="v-x1">0.00</span></div>
+          <input type="range" id="x1" min="-0.5" max="0.8" step="0.01" value="0">
+          <div class="desc">Pinion addendum modification. Positive shift thickens the root (avoids undercut, raises strength).</div></div>
+        <div class="field adv pair-only"><div class="field-row"><label>Profile shift x₂ <span class="badge-adv">ADV</span></label><span class="val" id="v-x2">0.00</span></div>
+          <input type="range" id="x2" min="-0.5" max="0.8" step="0.01" value="0">
+          <div class="desc">Gear profile shift. Sum (x₁+x₂) changes the working pressure angle and centre distance.</div></div>
+        <button class="opt-btn pair-only" id="optBtn">⚖ Auto-balance root safety (profile shift)</button>
+        <div class="opt-out pair-only" id="optOut"></div>
+        <div class="field adv"><div class="field-row"><label>Profile quality <span class="badge-adv">ADV</span></label><span class="val" id="v-res">16</span></div>
+          <input type="range" id="res" min="6" max="34" step="1" value="16">
+          <div class="desc">Involute points per flank in the exported mesh. Higher = smoother STL, larger file.</div></div>
+      </div>
+
+      <div class="sec">
+        <div class="sec-title">Operating Load</div>
+        <div class="field"><div class="field-row"><label>Input torque T₁ (N·m)</label></div>
+          <input type="number" id="torque" value="2" min="0.001" step="0.1">
+          <div class="desc">Torque on the pinion (input) shaft. Tangential force Fₜ = 2000·T₁ / d₁.</div></div>
+        <div class="field"><div class="field-row"><label>Input speed n₁ (rpm)</label></div>
+          <input type="number" id="rpm" value="300" min="0" step="10">
+          <div class="desc">Pinion speed. Drives pitch-line velocity and frictional heating. Output n₂ = n₁ / i.</div></div>
+      </div>
+
+      <div class="sec">
+        <div class="sec-title">Material</div>
+        <div class="field"><div class="field-row"><label>Polymer</label></div>
+          <select id="material"></select>
+          <div class="desc">Library values are <b>indicative, room-temperature</b> figures — verify against your datasheet / VDI 2736 tables. Select “Custom” for manual entry.</div></div>
+        <div class="field"><div class="field-row"><label>Young's modulus E (MPa)</label></div><input type="number" id="m_E" value="2000" step="50"></div>
+        <div class="field"><div class="field-row"><label>Perm. root stress σ<sub>Flim</sub> (MPa)</label></div><input type="number" id="m_sF" value="28" step="1">
+          <div class="desc">Allowable tooth-root bending stress (RT, ~10⁶–10⁷ cycles).</div></div>
+        <div class="field adv"><div class="field-row"><label>Perm. flank stress σ<sub>Hlim</sub> (MPa) <span class="badge-adv">ADV</span></label></div><input type="number" id="m_sH" value="45" step="1"></div>
+        <div class="field adv"><div class="field-row"><label>Poisson ratio ν <span class="badge-adv">ADV</span></label></div><input type="number" id="m_nu" value="0.39" step="0.01"></div>
+        <div class="field adv"><div class="field-row"><label>Max service temp (°C) <span class="badge-adv">ADV</span></label></div><input type="number" id="m_T" value="105" step="5"></div>
+        <div class="field adv"><div class="field-row"><label>Friction coeff. μ <span class="badge-adv">ADV</span></label></div><input type="number" id="m_mu" value="0.30" step="0.01"></div>
+        <div class="field adv"><div class="field-row"><label>Print derating K<sub>print</sub> <span class="badge-adv">ADV</span></label><span class="val" id="v-kp">0.70</span></div>
+          <input type="range" id="kprint" min="0.4" max="1" step="0.05" value="0.7">
+          <div class="desc">Knock-down for FDM layer-adhesion anisotropy at the root. 1.0 = injection-moulded; ~0.6–0.8 typical for printed teeth.</div></div>
+      </div>
+
+      <div class="sec">
+        <div class="sec-title">Hub &amp; Bore</div>
+        <div class="field"><div class="field-row"><label>Bore type</label></div>
+          <select id="boreType"><option value="round">Round (plain)</option><option value="d">D-profile (flat)</option><option value="key">Keyway (DIN 6885)</option><option value="hex">Hex socket</option><option value="none">No bore</option></select></div>
+        <div class="field"><div class="field-row"><label>Shaft Ø (mm)</label><span class="val" id="v-bore">6.0</span></div>
+          <input type="range" id="bore" min="2" max="40" step="0.5" value="6">
+          <div class="desc">Nominal shaft diameter the gear mounts on.</div></div>
+        <div class="field adv"><div class="field-row"><label>Fit clearance (mm, radial) <span class="badge-adv">ADV</span></label></div><input type="number" id="fit" value="0.2" step="0.05">
+          <div class="desc">Radial clearance added to the printed bore for a slip/press fit. Applied to both gears.</div></div>
+        <div class="field bore-d"><div class="field-row"><label>Flat distance from centre (mm)</label><span class="val" id="v-dflat">2.0</span></div>
+          <input type="range" id="dflat" min="0.5" max="20" step="0.1" value="2">
+          <div class="desc">Centre-to-flat of the D. Smaller = deeper flat = more torque key.</div></div>
+        <div class="field bore-key"><div class="field-row"><label>Keyway <span class="badge-adv">DIN 6885-1</span></label></div>
+          <div class="desc" id="keyInfo">Key width b and hub depth t₂ auto-selected from shaft Ø per DIN 6885-1.</div></div>
+        <div class="field bore-key adv"><div class="field-row"><label>Key width override (mm) <span class="badge-adv">ADV</span></label></div><input type="number" id="keyW" value="0" step="0.5"><div class="desc">0 = use DIN auto value.</div></div>
+        <div class="field bore-key adv"><div class="field-row"><label>Hub keyway depth t₂ override (mm) <span class="badge-adv">ADV</span></label></div><input type="number" id="keyT" value="0" step="0.1"></div>
+        <div class="field bore-hex"><div class="field-row"><label>Across-flats AF (mm)</label><span class="val" id="v-hex">5.0</span></div>
+          <input type="range" id="hexAF" min="2" max="30" step="0.5" value="5"></div>
+        <div class="field adv"><div class="field-row"><label>Extended hub boss <span class="badge-adv">ADV</span></label></div>
+          <select id="hubOn"><option value="0">None</option><option value="1">Add boss (one face)</option></select></div>
+        <div class="field adv hub-on"><div class="field-row"><label>Boss Ø (mm)</label><span class="val" id="v-hubd">14.0</span></div><input type="range" id="hubD" min="5" max="60" step="0.5" value="14"></div>
+        <div class="field adv hub-on"><div class="field-row"><label>Boss length (mm)</label><span class="val" id="v-hubl">8.0</span></div><input type="range" id="hubL" min="1" max="40" step="0.5" value="8"></div>
+      </div>
+
+      <div class="sec adv">
+        <div class="sec-title">Advanced Factors</div>
+        <div class="field"><div class="field-row"><label>Gear loss factor H<sub>V</sub></label></div><input type="number" id="hvOver" value="0" step="0.01"><div class="desc">Mesh loss factor (Ohlendorf). 0 = auto-estimate.</div></div>
+        <div class="field"><div class="field-row"><label>Thermal resistance R<sub>th</sub> (K/W)</label></div><input type="number" id="rth" value="8" step="0.5"><div class="desc">Lumped gear-to-ambient resistance for the indicative flank-temp estimate.</div></div>
+        <div class="field"><div class="field-row"><label>Wear rate k<sub>w</sub> (×10⁻⁶ mm³/N·m)</label></div><input type="number" id="kw" value="5" step="0.5"><div class="desc">Polymer specific wear rate for the indicative wear-depth estimate. 0 disables.</div></div>
+        <div class="field"><div class="field-row"><label>Design life (×10⁶ cycles)</label></div><input type="number" id="life" value="1" step="0.5"></div>
+      </div>
+    </div>
+
+    <!-- VIEWPORT -->
+    <div id="viewport" class="tab-designer">
+      <canvas id="canvas"></canvas>
+      <div id="vp-hint">DRAG: orbit · WHEEL: zoom</div>
+      <div id="legend"><span style="color:var(--amber)">●</span> <b>Pinion z₁</b><br><span style="color:var(--steel)">●</span> <b>Gear z₂</b><br><span id="legend-aw"></span></div>
+      <div id="watermark">DRYROCK·DESIGN</div>
+      <div id="vp-actions">
+        <button class="vbtn stl" id="dlStl">Download STL ↓</button>
+        <button class="vbtn pdf" id="dlPdf">Export PDF ↓</button>
+        <button class="vbtn anim pair-only" id="animBtn">▶ Mesh anim</button>
+      </div>
+    </div>
+
+    <!-- RESULTS -->
+    <div id="results" class="tab-designer">
+      <div class="r-sec" id="verdicts"></div>
+      <div class="r-sec pair-only">
+        <div class="r-title">Drive Kinematics</div>
+        <div class="r-row"><span>Reduction ratio i</span><span id="o-i">—</span></div>
+        <div class="r-row"><span>Input  T₁ / n₁</span><span id="o-in">—</span></div>
+        <div class="r-row"><span>Output T₂ / n₂</span><span id="o-out">—</span></div>
+        <div class="r-row"><span>Mesh efficiency η</span><span id="o-eta">—</span></div>
+        <div class="r-row"><span>Power in → out</span><span id="o-pwr">—</span></div>
+      </div>
+      <div class="r-sec">
+        <div class="r-title">Geometry</div>
+        <div class="r-row"><span>Pitch Ø d₁</span><span id="o-d1">—</span></div>
+        <div class="r-row"><span>Tip Ø dₐ₁</span><span id="o-da1">—</span></div>
+        <div class="r-row"><span>Root Ø d_f₁</span><span id="o-df1">—</span></div>
+        <div class="r-row pair-only"><span>Gear Ø d₂ / dₐ₂</span><span id="o-d2">—</span></div>
+        <div class="r-row pair-only"><span>Working centre a_w</span><span id="o-aw">—</span></div>
+        <div class="r-row"><span>Contact ratio ε_α</span><span id="o-eps">—</span></div>
+        <div class="r-row adv"><span>Working PA α_w</span><span id="o-aw-pa">—</span></div>
+      </div>
+      <div class="r-sec">
+        <div class="r-title">Kinematics &amp; Load</div>
+        <div class="r-row"><span>Tangential force Fₜ</span><span id="o-ft">—</span></div>
+        <div class="r-row"><span>Pitch-line velocity v</span><span id="o-v">—</span></div>
+        <div class="r-row"><span>Transmitted power P</span><span id="o-p">—</span></div>
+      </div>
+      <div class="r-sec">
+        <div class="r-title">Strength (VDI 2736)</div>
+        <div class="r-row"><span>Pinion root σ_F₁</span><span id="o-sf">—</span></div>
+        <div class="r-row pair-only"><span>Gear root σ_F₂</span><span id="o-sf2">—</span></div>
+        <div class="r-row"><span>Perm. root σ_FP</span><span id="o-sfp">—</span></div>
+        <div class="r-row"><span>Contact stress σ_H</span><span id="o-sh">—</span></div>
+        <div class="r-row"><span>Perm. flank σ_HP</span><span id="o-shp">—</span></div>
+        <div class="r-row adv"><span>Form factor Y_Fa·Y_Sa</span><span id="o-yf">—</span></div>
+        <div class="r-row adv"><span>Elasticity Z_E</span><span id="o-ze">—</span></div>
+      </div>
+      <div class="r-sec adv">
+        <div class="r-title">Thermal · PV · Wear (indicative)</div>
+        <div class="r-row"><span>Mesh power loss P_VZ</span><span id="o-ploss">—</span></div>
+        <div class="r-row"><span>Est. flank temp θ_fla</span><span id="o-temp">—</span></div>
+        <div class="r-row"><span>PV indicator</span><span id="o-pv">—</span></div>
+        <div class="r-row"><span>Est. wear depth</span><span id="o-wear">—</span></div>
+      </div>
+      <div class="r-sec">
+        <div class="r-title">Warnings</div>
+        <div id="warnings"></div>
+      </div>
+    </div>
+
+    <!-- GUIDE -->
+    <div id="guide" class="tab-guide hidden">
+      <div class="g-wrap">
+        <h2>User Guide &amp; Methodology</h2>
+        <div class="g-sub">Dryrock Design — Polymer Gear Design Studio</div>
+        <p>This studio sizes and verifies <b>thermoplastic spur gears</b> following the framework of <b>VDI 2736 Part 2</b> (load-carrying capacity of cylindrical thermoplastic gears), the de-facto reference for plastic gearing. Metal standards (ISO 6336, AGMA 2001) are not directly applicable because polymers exhibit low temperature-dependent modulus, viscoelastic load sharing, frictional self-heating and wear-dominated failure.</p>
+        <div class="note"><b>Scope &amp; honesty.</b> Geometric and force computations are exact. Form factors (Y<sub>Fa</sub>, Y<sub>Sa</sub>) are interpolated from ISO/VDI tables; profile-shift strengthening is credited via an <i>approximate</i> form-factor correction (≈ −18 %·x on Y<sub>Fa</sub>). Thermal, PV and wear outputs are <i>indicative estimates</i> from empirical coefficients (μ, H<sub>V</sub>, R<sub>th</sub>, k<sub>w</sub>) you must supply from VDI 2736 tables or supplier data. Material library values are order-of-magnitude and must be verified.</div>
+        <h3>1 · Geometry &amp; nomenclature</h3>
+        <p>For module <code>m</code>, teeth <code>z</code>, shift <code>x</code>: pitch <code>d = m·z</code>; base <code>d_b = d·cos α</code>; tip <code>dₐ = m·(z+2+2x)</code>; root <code>d_f = m·(z−2.5+2x)</code>. The transverse <b>contact ratio</b> ε<sub>α</sub> should exceed 1.2. For a pair, profile shift sets the <b>working pressure angle</b> via <code>inv α_w = inv α + 2 tan α (x₁+x₂)/(z₁+z₂)</code> and <b>centre distance</b> <code>a_w = a·cos α / cos α_w</code>.</p>
+        <h3>2 · Tangential load &amp; kinematics</h3>
+        <p><code>Fₜ = 2000·T₁ / d₁</code> (N). Pitch-line velocity <code>v = π·d₁·n₁/60000</code> (m/s). Power <code>P = T₁·2π·n₁/60</code> (W). For a pair, output <code>n₂ = n₁/i</code>, <code>T₂ = T₁·i·η</code>, where i = z₂/z₁ and η is the mesh efficiency from the friction-loss estimate.</p>
+        <h3>3 · Tooth-root bending (failure: root crack)</h3>
+        <p><code>σ_F = (Fₜ/(b·m))·Y_Fa·Y_Sa·Y_ε</code>, with Y<sub>ε</sub>=0.25+0.75/ε<sub>α</sub>. Computed for <b>both</b> pinion and gear (the gear has more teeth, hence lower form factor and stress). Safety <code>S_F = σ_FP/σ_F</code>, σ<sub>FP</sub> = σ<sub>Flim</sub>·K<sub>print</sub>. Aim <b>S_F ≥ 1.5–2.0</b> for printed polymer given data scatter.</p>
+        <h3>4 · Tooth-flank contact (failure: pitting / wear)</h3>
+        <p><code>σ_H = Z_E·Z_H·Z_ε·√(Fₜ·(u+1)/(b·d₁·u))</code>. The elasticity factor Z<sub>E</sub> is small for polymers, so flank stress is usually low; plastic-pair flank failure is dominated by <b>wear and temperature</b>, not classical pitting.</p>
+        <h3>5 · Frictional heating &amp; flank temperature</h3>
+        <p>VDI 2736 makes the verification <b>temperature-based</b>. Mesh loss <code>P_VZ ≈ μ·H_V·P</code>; indicative flank temperature <code>θ_fla ≈ θ₀ + P_VZ·R_th</code>. R<sub>th</sub> depends strongly on housing/airflow — treat θ as a screening figure. Keep it well below the polymer's continuous service temperature.</p>
+        <h3>6 · Profile shift &amp; auto-balance</h3>
+        <p>Positive pinion shift prevents <b>undercut</b> below <code>z_min = 2(1−x)/sin²α</code> (≈17 at 20°). In Pair mode the <b>Auto-balance</b> button scans x₁ (with x₂ = −x₁ to preserve centre distance) to equalise pinion and gear root safety — the classic way to make the weak pinion as durable as the gear.</p>
+        <h3>7 · Root fillet</h3>
+        <p>The sharp root corner is the primary crack-initiation site, especially in layered FDM parts. The <b>root fillet</b> ρ (entered as a fraction of module, standard basic-rack value ρ<sub>fP</sub> = 0.38·m) rounds this corner, lowering the stress-concentration factor. Larger fillets help printed gears most.</p>
+        <h3>8 · Hub, bore &amp; keyway</h3>
+        <p>Round, D-profile, hex and parallel-key (DIN 6885-1) bores are supported; key width and hub depth auto-select from shaft Ø. A radial <b>fit clearance</b> enlarges the printed bore for a slip/press fit. For printed parts prefer a D-flat or hex over a keyway, whose corners are fracture-prone.</p>
+        <h3>9 · 3D-printing notes</h3>
+        <p>FDM gears are <b>anisotropic</b>; layer lines printed flat create weak planes in the loaded root. K<sub>print</sub> knocks the permissible stress down accordingly. PA / PA-CF are the strongest practical printed gear materials; PETG/ASA mid-range; PLA brittle and low-temperature. Increase module, face width and fillet; minimise running temperature.</p>
+        <h3>Symbol reference</h3>
+        <table class="gtab"><tr><th>Symbol</th><th>Meaning</th><th>Unit</th></tr>
+          <tr><td>m</td><td>Module</td><td>mm</td></tr><tr><td>z₁, z₂</td><td>Pinion / gear teeth</td><td>—</td></tr>
+          <tr><td>b</td><td>Face width</td><td>mm</td></tr><tr><td>α / α_w</td><td>Reference / working PA</td><td>°</td></tr>
+          <tr><td>x</td><td>Profile shift coefficient</td><td>—</td></tr><tr><td>ρ</td><td>Root fillet radius</td><td>×m</td></tr>
+          <tr><td>i, u</td><td>Reduction / gear ratio</td><td>—</td></tr><tr><td>Fₜ</td><td>Tangential force</td><td>N</td></tr>
+          <tr><td>σ_F / σ_H</td><td>Root / flank stress</td><td>MPa</td></tr><tr><td>S_F / S_H</td><td>Root / flank safety</td><td>—</td></tr>
+          <tr><td>ε_α</td><td>Contact ratio</td><td>—</td></tr><tr><td>θ_fla</td><td>Est. flank temperature</td><td>°C</td></tr></table>
+        <div class="note">© 2026 <b>Dryrock Design</b>. All rights reserved. This software and its underlying methodology may not be copied, redistributed, reverse-engineered, or shared with third parties or organisations without prior written permission. Designed for makers and hobby projects — for any serious or load-bearing application, verify every result with independent engineering calculation and physical testing.</div>
+      </div>
+    </div>
+
+    <!-- CONTACT -->
+    <div id="contact" class="tab-contact hidden">
+      <div class="c-wrap">
+        <h2>Contact</h2>
+        <div class="c-sub">Dryrock Design</div>
+        <p>Questions, custom gear requests, bug reports, licensing or commercial use — get in touch. We read every message.</p>
+        <div class="contact-card">
+          <div class="em-label">Email</div>
+          <a href="mailto:dryrockdesign@gmail.com">dryrockdesign@gmail.com</a>
+        </div>
+        <div class="note">For feature requests, please include your module, tooth counts, material and the failure mode you are designing against — it helps us respond faster.<br><br>© 2026 <b>Dryrock Design</b>. All rights reserved. No copying, redistribution, reverse-engineering, or sharing with third parties / organisations without written permission.</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="footer">
+    <span>Designed for makers &amp; hobby projects. For serious applications, verify all results with proper engineering calculations.</span>
+    <span>Contact: <a href="mailto:dryrockdesign@gmail.com">dryrockdesign@gmail.com</a> · © 2026 <b>Dryrock Design</b> — All rights reserved · No copying, redistribution, or sharing with third parties/organisations.</span>
+  </div>
+</div>
+
+<script>
+// ===== DATA =====
+const MATERIALS={
+  "POM (Acetal / Delrin) — moulded ref":{E:2800,nu:0.35,sF:32,sH:50,T:100,mu:0.28},
+  "PA66 (Nylon) — moulded":{E:2000,nu:0.39,sF:28,sH:45,T:105,mu:0.30},
+  "PA12 (Nylon)":{E:1500,nu:0.40,sF:22,sH:38,T:90,mu:0.32},
+  "PA-CF (Carbon-filled nylon) — printed":{E:4500,nu:0.38,sF:40,sH:55,T:110,mu:0.25},
+  "PETG — printed":{E:2100,nu:0.40,sF:18,sH:30,T:65,mu:0.35},
+  "ABS / ASA — printed":{E:2200,nu:0.38,sF:20,sH:32,T:85,mu:0.35},
+  "PLA — printed":{E:3200,nu:0.36,sF:15,sH:28,T:55,mu:0.38},
+  "PC (Polycarbonate) — printed":{E:2300,nu:0.38,sF:30,sH:45,T:115,mu:0.34},
+  "TPU (flexible) — printed":{E:30,nu:0.45,sF:5,sH:10,T:70,mu:0.40},
+  "Custom (manual entry)":{E:2000,nu:0.39,sF:28,sH:45,T:105,mu:0.30}
+};
+const DIN6885=[[8,2,1.0],[10,3,1.4],[12,4,1.8],[17,5,2.3],[22,6,2.8],[30,8,3.3],[38,10,3.3],[44,12,3.3],[50,14,3.8],[58,16,4.3],[65,18,4.4],[75,20,4.9]];
+function keyForShaft(d){for(const r of DIN6885){if(d<=r[0])return{b:r[1],t2:r[2]};}return{b:22,t2:5.4};}
+const ZT=[12,14,17,20,25,30,40,50,60,80,100,150,250];
+const YFA=[3.47,3.27,3.03,2.90,2.73,2.60,2.45,2.37,2.32,2.25,2.21,2.16,2.12];
+const YSA=[1.44,1.48,1.52,1.55,1.59,1.63,1.67,1.71,1.73,1.77,1.80,1.85,1.90];
+function interp(x,xs,ys){if(x<=xs[0])return ys[0];if(x>=xs[xs.length-1])return ys[ys.length-1];for(let i=0;i<xs.length-1;i++){if(x<=xs[i+1]){const t=(x-xs[i])/(xs[i+1]-xs[i]);return ys[i]+t*(ys[i+1]-ys[i]);}}return ys[ys.length-1];}
+function formFactors(z,x){return{YFa:Math.max(1.5,interp(z,ZT,YFA)*(1-0.18*x)),YSa:Math.max(1.2,interp(z,ZT,YSA)*(1+0.10*x))};}
+const invFn=a=>Math.tan(a)-a;
+function invInverse(t){let a=Math.cbrt(3*t)||0.3;for(let i=0;i<40;i++){const f=Math.tan(a)-a-t,df=Math.tan(a)**2;a-=f/df;}return a;}
+
+// ===== GEOMETRY =====
+function borePoints(type,p){
+  const N=64,pts=[],r=(p.bore+2*p.fit)/2;
+  if(type==='round'){for(let i=0;i<N;i++){const t=i/N*2*Math.PI;pts.push([r*Math.cos(t),r*Math.sin(t)]);}}
+  else if(type==='d'){const f=Math.min(p.dflat,r-0.2),a0=Math.acos(Math.max(-1,Math.min(1,f/r)));const s=Math.round(N*0.85);for(let i=0;i<=s;i++){const t=a0+(2*Math.PI-2*a0)*(i/s);pts.push([r*Math.cos(t),r*Math.sin(t)]);}}
+  else if(type==='hex'){const R=(p.hexAF+2*p.fit)/Math.sqrt(3);for(let i=0;i<6;i++){const t=i/6*2*Math.PI+Math.PI/6;pts.push([R*Math.cos(t),R*Math.sin(t)]);}}
+  else if(type==='key'){const hw=p._kb/2,t2=p._kt,yc=Math.sqrt(Math.max(0,r*r-hw*hw)),aR=Math.atan2(yc,hw),aL=Math.PI-aR,s=Math.round(N*0.9);for(let i=0;i<=s;i++){const t=aL+((aR+2*Math.PI)-aL)*(i/s);pts.push([r*Math.cos(t),r*Math.sin(t)]);}pts.push([hw,r+t2]);pts.push([-hw,r+t2]);}
+  return pts;
+}
+function gearShape(p,teeth,x){
+  const m=p.module,z=teeth,a=p.pa*Math.PI/180,seg=p.res;
+  const r=m*z/2,rb=r*Math.cos(a),ra=m*(z+2+2*x)/2,rf=m*(z-2.5+2*x)/2;
+  const invA=invFn(a),halfTooth=Math.PI/(2*z)+2*x*Math.tan(a)/z;
+  const uAt=rad=>Math.sqrt(Math.max(0,(rad/rb)*(rad/rb)-1));
+  const uTip=uAt(ra),rFil=Math.max(0,Math.min(p.fillet*m,0.45*m));
+  const rStart=Math.max(rf+rFil*0.8,rb,rf+1e-3),uStart=uAt(Math.max(rStart,rb)),step=2*Math.PI/z;
+  const inv=[];for(let i=0;i<=seg;i++){const u=uStart+(uTip-uStart)*(i/seg);const rad=rb*Math.sqrt(1+u*u);const phi=u-Math.atan(u);inv.push({rad,ang:halfTooth+invA-phi});}
+  const angB=inv[0].ang,gapHalf=Math.max(0,step/2-angB);
+  const dGap=Math.min(rFil/Math.max(rf,1),0.8*gapHalf);
+  let fil;
+  if(rFil<=1e-3)fil=[{rad:rf,ang:angB}];
+  else{fil=[];const N=4,angR=angB+dGap;for(let i=0;i<=N;i++){const t=i/N;fil.push({rad:rf*(1-t*t)+rStart*t*t,ang:(1-t)*(1-t)*angR+(1-(1-t)*(1-t))*angB});}}
+  const shape=new THREE.Shape();let first=true;
+  const push=(rad,ang)=>{const X=rad*Math.cos(ang),Y=rad*Math.sin(ang);if(first){shape.moveTo(X,Y);first=false;}else shape.lineTo(X,Y);};
+  for(let t=0;t<z;t++){const base=t*step;
+    for(const f of fil)push(f.rad,base-f.ang);
+    for(let i=0;i<inv.length;i++)push(inv[i].rad,base-inv[i].ang);
+    const tipAng=inv[inv.length-1].ang,arcSeg=Math.max(2,Math.round(seg/3));
+    for(let i=1;i<arcSeg;i++)push(ra,base-tipAng+2*tipAng*(i/arcSeg));
+    for(let i=inv.length-1;i>=0;i--)push(inv[i].rad,base+inv[i].ang);
+    for(let i=fil.length-1;i>=0;i--)push(fil[i].rad,base+fil[i].ang);
+    const rootA=base+fil[0].ang,rootB=(t+1)*step-fil[0].ang,rSeg=Math.max(2,Math.round(seg/3));
+    for(let i=1;i<rSeg;i++)push(rf,rootA+(rootB-rootA)*(i/rSeg));
+  }
+  shape.closePath();
+  if(p.boreType!=='none'){const bp=borePoints(p.boreType,p);if(bp.length>2){const h=new THREE.Path();h.moveTo(bp[0][0],bp[0][1]);for(let i=1;i<bp.length;i++)h.lineTo(bp[i][0],bp[i][1]);h.closePath();shape.holes.push(h);}}
+  return {shape,r,rb,ra,rf};
+}
+function geomsFor(p,teeth,x){
+  const {shape,ra}=gearShape(p,teeth,x),b=p.fw,geoms=[];
+  const g=new THREE.ExtrudeGeometry(shape,{depth:b,bevelEnabled:false,steps:1});g.translate(0,0,-b/2);g.rotateX(-Math.PI/2);geoms.push(g);
+  if(p.hubOn==='1'&&p.boreType!=='none'&&p.hubD>(p.bore+2*p.fit)+1){
+    const hs=new THREE.Shape();hs.absarc(0,0,p.hubD/2,0,2*Math.PI,false);
+    const bp=borePoints(p.boreType,p);if(bp.length>2){const h=new THREE.Path();h.moveTo(bp[0][0],bp[0][1]);for(let i=1;i<bp.length;i++)h.lineTo(bp[i][0],bp[i][1]);h.closePath();hs.holes.push(h);}
+    const gh=new THREE.ExtrudeGeometry(hs,{depth:p.hubL,bevelEnabled:false,steps:1});gh.translate(0,0,b/2);gh.rotateX(-Math.PI/2);geoms.push(gh);
+  }
+  return {geoms,ra};
+}
+
+// ===== VDI 2736 ENGINE =====
+function compute(p){
+  const a=p.pa*Math.PI/180,m=p.module;
+  const z1=p.teeth,z2=p.mode==='pair'?p.teeth2:p.teeth;
+  const x1=p.x1,x2=p.mode==='pair'?p.x2:p.x1;
+  const d1=m*z1,d2=m*z2,rb1=d1/2*Math.cos(a),rb2=d2/2*Math.cos(a);
+  const ra1=m*(z1+2+2*x1)/2,ra2=m*(z2+2+2*x2)/2;
+  let aw=a,awC=m*(z1+z2)/2;
+  if(p.mode==='pair'&&(x1+x2)!==0){aw=invInverse(invFn(a)+2*Math.tan(a)*(x1+x2)/(z1+z2));awC=m*(z1+z2)/2*Math.cos(a)/Math.cos(aw);}
+  const eps=(Math.sqrt(Math.max(0,ra1*ra1-rb1*rb1))+Math.sqrt(Math.max(0,ra2*ra2-rb2*rb2))-awC*Math.sin(aw))/(Math.PI*m*Math.cos(a));
+  const u=z2/z1>=1?z2/z1:z1/z2;
+  const T1=p.torque,n1=p.rpm,Ft=2000*T1/d1,v=Math.PI*d1*n1/60000,P=T1*2*Math.PI*n1/60;
+  const Yeps=0.25+0.75/Math.max(eps,0.4);
+  const f1=formFactors(z1,x1),f2=formFactors(z2,x2);
+  const sF1=(Ft/(p.fw*m))*f1.YFa*f1.YSa*Yeps,sF2=(Ft/(p.fw*m))*f2.YFa*f2.YSa*Yeps;
+  const sFP=p.m_sF*p.kprint,SF1=sFP/sF1,SF2=sFP/sF2;
+  const ZE=Math.sqrt(1/(Math.PI*((1-p.m_nu*p.m_nu)/p.m_E+(1-p.m_nu*p.m_nu)/p.m_E)));
+  const ZH=Math.sqrt(2*Math.cos(aw)/(Math.cos(a)*Math.cos(a)*Math.sin(aw)));
+  const Zeps=Math.sqrt(Math.max((4-eps)/3,1/Math.max(eps,0.4)));
+  const sH=ZE*ZH*Zeps*Math.sqrt(Ft*(u+1)/(p.fw*d1*u)),sHP=p.m_sH*p.kprint,SH=sHP/sH;
+  let HV=p.hvOver>0?p.hvOver:(Math.PI*(u+1)/(z1*u))*(1-eps+eps*eps/3);HV=Math.max(0.01,Math.min(HV,0.5));
+  const Ploss=p.m_mu*HV*P,theta=23+Ploss*p.rth,PV=sH*v;
+  const i=z2/z1,eta=Math.max(0.5,Math.min(0.999,1-Ploss/Math.max(P,1e-6)));
+  const n2=n1/i,T2=T1*i*eta,Pout=P*eta;
+  const cycles=p.life*1e6,wear=p.kw>0?(p.kw*1e-6)*Ft*(0.5*m*1e-3)*cycles/p.fw*1000:0;
+  return{d1,d2,da1:2*ra1,da2:2*ra2,df1:m*(z1-2.5+2*x1),ratio:i,aw:awC,awPA:aw*180/Math.PI,eps,u,
+    Ft,v,P,sF1,sF2,sFP,SF1,SF2,YFa:f1.YFa,YSa:f1.YSa,ZE,ZH,sH,sHP,SH,HV,Ploss,theta,PV,wear,
+    z1,z2,x1,x2,n1,T1,n2,T2,eta,Pout};
+}
+// optimizer
+function balanceShift(p){
+  const a=p.pa*Math.PI/180,z1=p.teeth,z2=p.teeth2,m=p.module,Ft=2000*p.torque/(m*z1),Yeps=1;
+  const sFP=p.m_sF*p.kprint;let best=null;
+  for(let x1=-0.4;x1<=0.8001;x1+=0.01){const x2=-x1;if(x2<-0.5||x2>0.8)continue;
+    const zm1=2*(1-x1)/Math.sin(a)**2,zm2=2*(1-x2)/Math.sin(a)**2;if(z1<zm1-0.5||z2<zm2-0.5)continue;
+    const f1=formFactors(z1,x1),f2=formFactors(z2,x2);
+    const s1=sFP/((Ft/(p.fw*m))*f1.YFa*f1.YSa),s2=sFP/((Ft/(p.fw*m))*f2.YFa*f2.YSa);
+    const score=Math.abs(s1-s2)-0.05*Math.min(s1,s2);
+    if(!best||score<best.score)best={x1:+x1.toFixed(2),x2:+x2.toFixed(2),s1,s2,score};}
+  return best;
+}
+
+// ===== THREE =====
+const canvas=document.getElementById('canvas');
+const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true,preserveDrawingBuffer:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+const scene=new THREE.Scene();const camera=new THREE.PerspectiveCamera(45,1,0.1,8000);
+scene.add(new THREE.AmbientLight(0xffffff,0.55));
+const kL=new THREE.DirectionalLight(0xffe9cc,1.15);kL.position.set(60,90,80);scene.add(kL);
+const rL=new THREE.DirectionalLight(0x6fb6dc,0.6);rL.position.set(-80,-30,-60);scene.add(rL);
+const mat1=new THREE.MeshStandardMaterial({color:0xff9e3d,metalness:0.6,roughness:0.4});
+const mat2=new THREE.MeshStandardMaterial({color:0x5fb0d4,metalness:0.6,roughness:0.4});
+const group1=new THREE.Group(),group2=new THREE.Group();scene.add(group1);scene.add(group2);
+let camDist=120,az=0.7,el=0.5,target=new THREE.Vector3(0,0,0);
+function updateCam(){camera.position.set(target.x+camDist*Math.cos(el)*Math.cos(az),target.y+camDist*Math.sin(el),target.z+camDist*Math.cos(el)*Math.sin(az));camera.lookAt(target);}
+let drag=false,px=0,py=0;
+canvas.addEventListener('mousedown',e=>{drag=true;px=e.clientX;py=e.clientY;});
+addEventListener('mouseup',()=>drag=false);
+addEventListener('mousemove',e=>{if(!drag)return;az+=(e.clientX-px)*0.008;el+=(e.clientY-py)*0.008;el=Math.max(-1.45,Math.min(1.45,el));px=e.clientX;py=e.clientY;updateCam();});
+canvas.addEventListener('wheel',e=>{e.preventDefault();camDist*=(1+Math.sign(e.deltaY)*0.08);camDist=Math.max(15,Math.min(2000,camDist));updateCam();},{passive:false});
+let lt=null;
+canvas.addEventListener('touchstart',e=>{if(e.touches.length===1)lt=e.touches[0];});
+canvas.addEventListener('touchmove',e=>{if(e.touches.length===1&&lt){const t=e.touches[0];az+=(t.clientX-lt.clientX)*0.01;el+=(t.clientY-lt.clientY)*0.01;el=Math.max(-1.45,Math.min(1.45,el));lt=t;updateCam();}e.preventDefault();},{passive:false});
+function resize(){const w=canvas.clientWidth,h=canvas.clientHeight;if(canvas.width!==w||canvas.height!==h){renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();}}
+let spin=false,animAngle=0,phase2=0,ratioZ=1;
+function animate(){resize();
+  if(spin){animAngle+=0.012;group1.rotation.y=animAngle;group2.rotation.y=phase2-animAngle*ratioZ;}
+  renderer.render(scene,camera);requestAnimationFrame(animate);}
+
+// ===== STATE / UI =====
+let curParams=null,curRes=null,g1geoms=[],g2geoms=[];
+const $=id=>document.getElementById(id);
+function readParams(){
+  const p={mode:document.querySelector('#modeSeg .on').dataset.mode,
+    module:+$('module').value,teeth:+$('teeth').value,teeth2:+$('teeth2').value,fw:+$('fw').value,
+    fillet:+$('fillet').value,pa:+$('pa').value,x1:+$('x1').value,x2:+$('x2').value,res:+$('res').value,
+    torque:+$('torque').value,rpm:+$('rpm').value,m_E:+$('m_E').value,m_sF:+$('m_sF').value,m_sH:+$('m_sH').value,
+    m_nu:+$('m_nu').value,m_T:+$('m_T').value,m_mu:+$('m_mu').value,kprint:+$('kprint').value,
+    boreType:$('boreType').value,bore:+$('bore').value,fit:+$('fit').value,dflat:+$('dflat').value,
+    keyW:+$('keyW').value,keyT:+$('keyT').value,hexAF:+$('hexAF').value,
+    hubOn:$('hubOn').value,hubD:+$('hubD').value,hubL:+$('hubL').value,
+    hvOver:+$('hvOver').value,rth:+$('rth').value,kw:+$('kw').value,life:+$('life').value};
+  const k=keyForShaft(p.bore);p._kb=p.keyW>0?p.keyW:k.b;p._kt=p.keyT>0?p.keyT:k.t2;
+  return p;
+}
+const fmt=(n,d=2)=>!isFinite(n)?'—':(Math.round(n*10**d)/10**d).toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d});
+const vClass=(s,lo,hi)=>s>=hi?'ok':s>=lo?'mid':'no';
+
+function rebuild(){
+  const p=readParams();curParams=p;
+  if(p.boreType==='key')$('keyInfo').textContent=`DIN 6885-1: key width b=${p._kb} mm, hub depth t₂=${p._kt} mm (shaft Ø${p.bore}).`;
+  // gear 1
+  const r1=geomsFor(p,p.teeth,p.x1);g1geoms=r1.geoms;
+  while(group1.children.length){const c=group1.children.pop();c.geometry.dispose();group1.remove(c);}
+  g1geoms.forEach(g=>group1.add(new THREE.Mesh(g,mat1)));
+  const res=compute(p);curRes=res;
+  // gear 2
+  while(group2.children.length){const c=group2.children.pop();c.geometry.dispose();group2.remove(c);}
+  if(p.mode==='pair'){
+    const r2=geomsFor(p,p.teeth2,p.x2);g2geoms=r2.geoms;
+    g2geoms.forEach(g=>group2.add(new THREE.Mesh(g,mat2)));
+    group2.position.x=res.aw;group1.position.x=0;
+    phase2=Math.PI-Math.PI/p.teeth2;ratioZ=p.teeth/p.teeth2;
+    if(!spin){group1.rotation.y=0;group2.rotation.y=phase2;}
+    group2.visible=true;
+    target.set(res.aw/2,0,0);camDist=Math.max((res.aw+res.da2/2)*1.5,40);updateCam();
+    $('legend').style.display='block';$('legend-aw').textContent='a_w = '+fmt(res.aw)+' mm';
+  }else{g2geoms=[];group2.visible=false;group1.position.x=0;group1.rotation.y=0;
+    target.set(0,0,0);camDist=Math.max(res.da1*1.7,40);updateCam();$('legend').style.display='none';}
+  renderResults(p,res);
+}
+
+function renderResults(p,res){
+  const pair=p.mode==='pair';
+  let v=`<div class="verdict ${vClass(res.SF1,1.0,1.5)}"><h4>${pair?'Pinion Root S_F₁':'Root Safety S_F'} <span class="sf"></span></h4><div class="big">${fmt(res.SF1,2)}</div><div class="sub">σ_F₁ ${fmt(res.sF1,1)} vs σ_FP ${fmt(res.sFP,1)} MPa. Aim ≥1.5 for printed polymer.</div></div>`;
+  if(pair)v+=`<div class="verdict ${vClass(res.SF2,1.0,1.5)}"><h4>Gear Root S_F₂ <span class="sf"></span></h4><div class="big">${fmt(res.SF2,2)}</div><div class="sub">σ_F₂ ${fmt(res.sF2,1)} MPa. Balance with optimizer if S_F₁≠S_F₂.</div></div>`;
+  v+=`<div class="verdict ${vClass(res.SH,1.0,1.5)}"><h4>Flank Safety S_H <span class="sf"></span></h4><div class="big">${fmt(res.SH,2)}</div><div class="sub">σ_H ${fmt(res.sH,1)} vs σ_HP ${fmt(res.sHP,1)} MPa.</div></div>`;
+  $('verdicts').innerHTML=v;
+  $('o-i').textContent=fmt(res.ratio,3)+' : 1';
+  $('o-in').textContent=fmt(res.T1,2)+' N·m / '+fmt(res.n1,0)+' rpm';
+  $('o-out').textContent=fmt(res.T2,2)+' N·m / '+fmt(res.n2,0)+' rpm';
+  $('o-eta').textContent=fmt(res.eta*100,1)+' %';
+  $('o-pwr').textContent=fmt(res.P,1)+' → '+fmt(res.Pout,1)+' W';
+  $('o-d1').textContent=fmt(res.d1)+' mm';$('o-da1').textContent=fmt(res.da1)+' mm';$('o-df1').textContent=fmt(res.df1)+' mm';
+  $('o-d2').textContent=fmt(res.d2)+' / '+fmt(res.da2)+' mm';
+  $('o-aw').textContent=fmt(res.aw)+' mm';$('o-eps').textContent=fmt(res.eps,3);$('o-aw-pa').textContent=fmt(res.awPA,2)+'°';
+  $('o-ft').textContent=fmt(res.Ft,1)+' N';$('o-v').textContent=fmt(res.v,3)+' m/s';$('o-p').textContent=fmt(res.P,1)+' W';
+  $('o-sf').textContent=fmt(res.sF1,2)+' MPa';$('o-sf2').textContent=fmt(res.sF2,2)+' MPa';$('o-sfp').textContent=fmt(res.sFP,2)+' MPa';
+  $('o-sh').textContent=fmt(res.sH,2)+' MPa';$('o-shp').textContent=fmt(res.sHP,2)+' MPa';
+  $('o-yf').textContent=fmt(res.YFa*res.YSa,3);$('o-ze').textContent=fmt(res.ZE,2)+' √MPa';
+  $('o-ploss').textContent=fmt(res.Ploss,2)+' W';$('o-temp').textContent=fmt(res.theta,1)+' °C';
+  $('o-pv').textContent=fmt(res.PV,1)+' MPa·m/s';$('o-wear').textContent=res.wear>0?fmt(res.wear,4)+' mm':'— (set k_w)';
+  const w=[],zmin=2*(1-p.x1)/Math.sin(p.pa*Math.PI/180)**2;
+  if(p.teeth<zmin)w.push(`Pinion z₁=${p.teeth} below undercut limit z_min≈${fmt(zmin,1)}. Add positive x₁.`);
+  if(res.eps<1.2)w.push(`Contact ratio ε_α=${fmt(res.eps,2)} < 1.2 — running may be rough/noisy.`);
+  if(Math.min(res.SF1,res.SF2)<1.5)w.push(`Root safety ${fmt(Math.min(res.SF1,res.SF2),2)} is low for printed polymer (aim ≥1.5–2.0). Increase m / b, raise fillet.`);
+  if(res.theta>p.m_T*0.8)w.push(`Est. flank temp ${fmt(res.theta,0)}°C approaches limit ${p.m_T}°C — reduce speed/load or change polymer.`);
+  if(res.v>3)w.push(`Pitch-line velocity ${fmt(res.v,1)} m/s is high for plastics — wear & heat dominate.`);
+  $('warnings').innerHTML=w.length?w.map(t=>`<div class="warn-item">⚠ ${t}</div>`).join(''):`<div class="r-row"><span>No critical warnings.</span><span style="color:var(--good)">✓</span></div>`;
+}
+
+// ===== STL =====
+function gatherTris(geoms){const out=[],vA=new THREE.Vector3(),vB=new THREE.Vector3(),vC=new THREE.Vector3(),cb=new THREE.Vector3(),ab=new THREE.Vector3();
+  for(const g of geoms){const pos=g.attributes.position,idx=g.index,n=idx?idx.count:pos.count;
+    for(let i=0;i<n;i+=3){const a=idx?idx.getX(i):i,b=idx?idx.getX(i+1):i+1,c=idx?idx.getX(i+2):i+2;
+      vA.fromBufferAttribute(pos,a);vB.fromBufferAttribute(pos,b);vC.fromBufferAttribute(pos,c);
+      cb.subVectors(vC,vB);ab.subVectors(vA,vB);cb.cross(ab).normalize();
+      out.push([cb.x,cb.y,cb.z,vA.x,vA.y,vA.z,vB.x,vB.y,vB.z,vC.x,vC.y,vC.z]);}}return out;}
+function stlBlob(geoms){const tris=gatherTris(geoms),buf=new ArrayBuffer(84+tris.length*50),dv=new DataView(buf);
+  dv.setUint32(80,tris.length,true);let o=84;for(const t of tris){for(let k=0;k<12;k++){dv.setFloat32(o,t[k],true);o+=4;}dv.setUint16(o,0,true);o+=2;}
+  return new Blob([buf],{type:'application/octet-stream'});}
+function dl(blob,name){const u=URL.createObjectURL(blob);const a=document.createElement('a');a.href=u;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(u),1500);}
+async function serverSTL(which){
+  const res=await fetch('/api/export-stl',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...curParams,which})});
+  if(res.status===401){location.href='/api/login';return;}
+  if(!res.ok){alert('Export failed. Please refresh and try again.');return;}
+  const blob=await res.blob();
+  const cd=res.headers.get('Content-Disposition')||'';const m=cd.match(/filename="(.+?)"/);
+  dl(blob,m?m[1]:'gear.stl');
+}
+$('dlStl').onclick=async()=>{await serverSTL('pinion');if(curParams.mode==='pair')await serverSTL('gear');};
+
+// ===== PDF =====
+$('dlPdf').onclick=()=>{const {jsPDF}=window.jspdf,doc=new jsPDF({unit:'mm',format:'a4'});
+  const p=curParams,r=curRes,W=210;let y=16;const dark=[30,33,40],amber=[255,158,61];
+  doc.setFillColor(...dark);doc.rect(0,0,W,26,'F');
+  doc.setTextColor(255,255,255);doc.setFont('helvetica','bold');doc.setFontSize(18);doc.text('DRYROCK DESIGN',14,13);
+  doc.setTextColor(...amber);doc.setFontSize(9);doc.setFont('helvetica','normal');doc.text('Polymer Gear Design Report — VDI 2736',14,20);
+  doc.setTextColor(120,126,140);doc.setFontSize(8);doc.text(new Date().toLocaleString('en-GB'),W-14,20,{align:'right'});
+  y=34;try{doc.addImage(renderer.domElement.toDataURL('image/png'),'PNG',W-78,y-2,64,44);}catch(e){}
+  const sect=t=>{doc.setFillColor(245,238,228);doc.rect(14,y-4,118,6.5,'F');doc.setTextColor(...dark);doc.setFont('helvetica','bold');doc.setFontSize(9.5);doc.text(t,16,y);y+=7;doc.setFont('helvetica','normal');doc.setFontSize(8.8);};
+  const row=(k,val)=>{doc.setTextColor(110,110,120);doc.text(k,16,y);doc.setTextColor(20,20,25);doc.text(String(val),130,y,{align:'right'});y+=4.7;};
+  sect('Configuration');
+  row('Mode',p.mode==='pair'?'Gear pair (single reduction)':'Single gear');
+  row('Material',$('material').value);row('Module m',p.module+' mm');
+  row('Teeth z1 / z2',p.mode==='pair'?`${p.teeth} / ${p.teeth2}`:`${p.teeth}`);
+  row('Pressure angle',p.pa+' deg');row('Profile shift x1 / x2',p.mode==='pair'?`${p.x1} / ${p.x2}`:`${p.x1}`);
+  row('Face width b',p.fw+' mm');row('Root fillet',p.fillet+' x m');row('Bore',`${p.boreType} O${p.bore} mm (fit +${p.fit})`);
+  y+=2;sect('Operating Load & Kinematics');
+  row('Input torque T1',p.torque+' N.m');row('Input speed n1',p.rpm+' rpm');
+  if(p.mode==='pair'){row('Reduction ratio i',fmt(r.ratio,3)+' : 1');row('Output torque T2',fmt(r.T2,3)+' N.m');row('Output speed n2',fmt(r.n2,1)+' rpm');row('Mesh efficiency',fmt(r.eta*100,1)+' %');}
+  row('Tangential force Ft',fmt(r.Ft,1)+' N');row('Pitch-line velocity v',fmt(r.v,3)+' m/s');row('Power in -> out',fmt(r.P,1)+' -> '+fmt(r.Pout,1)+' W');
+  y+=2;sect('Geometry');
+  row('Pinion pitch/tip/root O',`${fmt(r.d1)} / ${fmt(r.da1)} / ${fmt(r.df1)} mm`);
+  if(p.mode==='pair'){row('Gear pitch/tip O',`${fmt(r.d2)} / ${fmt(r.da2)} mm`);row('Working centre a_w',fmt(r.aw)+' mm');}
+  row('Contact ratio eps_a',fmt(r.eps,3));
+  y+=2;sect('Strength Verification (VDI 2736)');
+  row('Material allow. (RT, indic.)',`sFlim ${p.m_sF} / sHlim ${p.m_sH} MPa`);row('Print derating Kprint',p.kprint);
+  row('Pinion root stress sF1',fmt(r.sF1,2)+' MPa');
+  doc.setFont('helvetica','bold');row('>> Pinion root safety S_F1',fmt(r.SF1,2)+(r.SF1>=1.5?'  PASS':r.SF1>=1?'  MARGINAL':'  FAIL'));doc.setFont('helvetica','normal');
+  if(p.mode==='pair'){row('Gear root stress sF2',fmt(r.sF2,2)+' MPa');doc.setFont('helvetica','bold');row('>> Gear root safety S_F2',fmt(r.SF2,2)+(r.SF2>=1.5?'  PASS':r.SF2>=1?'  MARGINAL':'  FAIL'));doc.setFont('helvetica','normal');}
+  row('Contact stress sH',fmt(r.sH,2)+' MPa');doc.setFont('helvetica','bold');row('>> Flank safety S_H',fmt(r.SH,2)+(r.SH>=1.5?'  PASS':r.SH>=1?'  MARGINAL':'  FAIL'));doc.setFont('helvetica','normal');
+  y+=2;sect('Thermal / PV / Wear (indicative)');
+  row('Mesh power loss P_VZ',fmt(r.Ploss,2)+' W');row('Est. flank temp',fmt(r.theta,1)+' degC (limit '+p.m_T+')');
+  row('PV indicator',fmt(r.PV,1)+' MPa.m/s');row('Est. wear depth',r.wear>0?fmt(r.wear,4)+' mm':'not evaluated');
+  y=266;doc.setDrawColor(220,220,225);doc.line(14,y,W-14,y);y+=4.5;
+  doc.setFontSize(7);doc.setTextColor(120,120,130);
+  doc.text('Designed for makers & hobby projects. Form/thermal/PV/wear factors are interpolated or indicative and material values are order-of-',14,y);y+=3;
+  doc.text('magnitude. Verify all results with proper engineering calculation and physical testing.   Contact: dryrockdesign@gmail.com',14,y);y+=3.8;
+  doc.setTextColor(150,90,30);doc.setFont('helvetica','bold');
+  doc.text('(c) 2026 Dryrock Design. All rights reserved. No copying, redistribution, or sharing with third parties / organisations.',14,y);
+  doc.save(`dryrock_gear_report_${p.mode}_m${p.module}_z${p.teeth}${p.mode==='pair'?'-'+p.teeth2:''}.pdf`);
+};
+
+// ===== BINDINGS =====
+const sl={module:['v-module',1],teeth:['v-teeth',0],teeth2:['v-teeth2',0],fw:['v-fw',1],fillet:['v-fillet',2],pa:['v-pa',0,'°'],x1:['v-x1',2],x2:['v-x2',2],res:['v-res',0],bore:['v-bore',1],dflat:['v-dflat',1],hexAF:['v-hex',1],kprint:['v-kp',2],hubD:['v-hubd',1],hubL:['v-hubl',1]};
+Object.keys(sl).forEach(id=>{const el=$(id);if(!el)return;const[lab,dec,suf='']=sl[id];const u=()=>$(lab).textContent=(+el.value).toFixed(dec)+suf;el.addEventListener('input',()=>{u();rebuild();});u();});
+['torque','rpm','m_E','m_sF','m_sH','m_nu','m_T','m_mu','keyW','keyT','fit','hvOver','rth','kw','life'].forEach(id=>$(id).addEventListener('input',rebuild));
+['boreType','hubOn'].forEach(id=>$(id).addEventListener('change',()=>{applyVis();rebuild();}));
+
+const matSel=$('material');
+Object.keys(MATERIALS).forEach(k=>{const o=document.createElement('option');o.value=k;o.textContent=k;matSel.appendChild(o);});
+matSel.value="PA66 (Nylon) — moulded";
+function applyMat(){const md=MATERIALS[matSel.value];if(md&&matSel.value!=='Custom (manual entry)'){$('m_E').value=md.E;$('m_sF').value=md.sF;$('m_sH').value=md.sH;$('m_nu').value=md.nu;$('m_T').value=md.T;$('m_mu').value=md.mu;}}
+matSel.addEventListener('change',()=>{applyMat();rebuild();});applyMat();
+
+$('optBtn').onclick=()=>{const p=readParams();const b=balanceShift(p);
+  if(!b){$('optOut').style.display='block';$('optOut').textContent='No feasible balanced shift found within limits (undercut/range). Try changing teeth or module.';return;}
+  $('x1').value=b.x1;$('x2').value=b.x2;$('v-x1').textContent=b.x1.toFixed(2);$('v-x2').textContent=b.x2.toFixed(2);
+  document.body.classList.contains('advanced')||$('levelSeg').querySelectorAll('button').forEach(bn=>{if(bn.dataset.level==='advanced'){bn.click();}});
+  rebuild();
+  $('optOut').style.display='block';$('optOut').innerHTML=`Applied x₁=${b.x1}, x₂=${b.x2} → S_F₁≈${fmt(b.s1,2)}, S_F₂≈${fmt(b.s2,2)} (balanced, centre distance preserved).`;
+};
+
+$('modeSeg').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;[...e.currentTarget.children].forEach(c=>c.classList.remove('on'));b.classList.add('on');applyVis();rebuild();});
+$('levelSeg').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;[...e.currentTarget.children].forEach(c=>c.classList.remove('on'));b.classList.add('on');document.body.className=b.dataset.level;});
+$('tabSeg').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;[...e.currentTarget.children].forEach(c=>c.classList.remove('on'));b.classList.add('on');const t=b.dataset.tab;
+  document.querySelectorAll('.tab-designer').forEach(el=>el.classList.toggle('hidden',t!=='designer'));
+  document.querySelector('.tab-guide').classList.toggle('hidden',t!=='guide');
+  document.querySelector('.tab-contact').classList.toggle('hidden',t!=='contact');});
+
+$('animBtn').onclick=()=>{spin=!spin;$('animBtn').textContent=spin?'⏸ Pause':'▶ Mesh anim';if(!spin){animAngle=0;rebuild();}};
+
+// save/load config
+$('saveCfg').onclick=()=>{const cfg={};['module','teeth','teeth2','fw','fillet','pa','x1','x2','res','torque','rpm','m_E','m_sF','m_sH','m_nu','m_T','m_mu','kprint','boreType','bore','fit','dflat','keyW','keyT','hexAF','hubOn','hubD','hubL','hvOver','rth','kw','life'].forEach(id=>cfg[id]=$(id).value);cfg.material=matSel.value;cfg.mode=document.querySelector('#modeSeg .on').dataset.mode;
+  dl(new Blob([JSON.stringify(cfg,null,2)],{type:'application/json'}),'dryrock_gear_config.json');};
+$('loadCfg').onclick=()=>$('cfgFile').click();
+$('cfgFile').onchange=e=>{const f=e.target.files[0];if(!f)return;const rd=new FileReader();rd.onload=()=>{try{const cfg=JSON.parse(rd.result);
+  Object.keys(cfg).forEach(id=>{if($(id))$(id).value=cfg[id];});if(cfg.material)matSel.value=cfg.material;
+  if(cfg.mode){document.querySelectorAll('#modeSeg button').forEach(b=>b.classList.toggle('on',b.dataset.mode===cfg.mode));}
+  Object.keys(sl).forEach(id=>{const[lab,dec,suf='']=sl[id];if($(id))$(lab).textContent=(+$(id).value).toFixed(dec)+suf;});
+  applyVis();rebuild();}catch(err){alert('Invalid config file.');}};rd.readAsText(f);};
+
+function applyVis(){
+  const pair=document.querySelector('#modeSeg .on').dataset.mode==='pair';
+  document.querySelectorAll('.pair-only').forEach(el=>el.style.display=pair?'':'none');
+  const bt=$('boreType').value;
+  document.querySelectorAll('.bore-d').forEach(el=>el.style.display=bt==='d'?'':'none');
+  document.querySelectorAll('.bore-key').forEach(el=>el.style.display=bt==='key'?'':'none');
+  document.querySelectorAll('.bore-hex').forEach(el=>el.style.display=bt==='hex'?'':'none');
+  document.querySelectorAll('.hub-on').forEach(el=>el.style.display=$('hubOn').value==='1'?'':'none');
+}
+applyVis();rebuild();updateCam();animate();
+</script>
+</body>
+</html>

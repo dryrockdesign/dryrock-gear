@@ -29,11 +29,12 @@ export async function onRequestGet({ request, env }) {
   if (!tokenRes.ok) return redirect(`${url.origin}/denied.html?e=token`);
   const token = await tokenRes.json();
 
-  // 2) Ask Patreon: who is this, and what is their membership on my campaign?
+  // 2) Ask Patreon: who is this, and which tiers are they entitled to on my campaign?
   const idUrl =
     "https://www.patreon.com/api/oauth2/v2/identity" +
-    "?include=memberships" +
+    "?include=memberships.currently_entitled_tiers" +
     "&fields%5Bmember%5D=patron_status,currently_entitled_amount_cents" +
+    "&fields%5Btier%5D=title" +
     "&fields%5Buser%5D=full_name";
   const meRes = await fetch(idUrl, {
     headers: { Authorization: `Bearer ${token.access_token}` },
@@ -41,22 +42,41 @@ export async function onRequestGet({ request, env }) {
   if (!meRes.ok) return redirect(`${url.origin}/denied.html?e=identity`);
   const me = await meRes.json();
 
-  // 3) Evaluate membership
-  const memberships = me.included || [];
+  // 3) Evaluate membership by TIER, not by dollar amount.
+  //    This is robust to discounts, promos, annual plans and currency differences:
+  //    a member keeps their tier even if they paid a reduced price.
+  //
+  //    ALLOWED_TIERS = comma-separated Patreon tier IDs that unlock the tools.
+  //    Set it as an environment variable in Cloudflare. Current tiers:
+  //      25753996 = All Designs + Engineering Tools ($9.90)
+  //      25754073 = Commercial License ($19.90)
+  //    To add a future tier, just append its ID to the ALLOWED_TIERS variable.
+  const allowedTiers = (env.ALLOWED_TIERS || "")
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
+
+  // Collect this user's active tier IDs from the included data.
+  const included = me.included || [];
   let active = false;
-  let cents = 0;
-  for (const inc of memberships) {
+  const userTierIds = [];
+  for (const inc of included) {
     if (inc.type === "member" && inc.attributes) {
-      if (inc.attributes.patron_status === "active_patron") {
-        active = true;
-        cents = Math.max(cents, inc.attributes.currently_entitled_amount_cents || 0);
-      }
+      if (inc.attributes.patron_status === "active_patron") active = true;
+      const tiers = inc.relationships?.currently_entitled_tiers?.data || [];
+      for (const t of tiers) userTierIds.push(String(t.id));
     }
   }
 
-  // Optional: require a minimum pledge (e.g. 500 = $5). Set MIN_CENTS env var, or leave 0.
-  const minCents = parseInt(env.MIN_CENTS || "0", 10);
-  if (!active || cents < minCents) {
+  // Access is granted only if the member is active AND holds an allowed tier.
+  // If ALLOWED_TIERS is empty (not configured), fall back to "any active patron"
+  // so the site never accidentally locks everyone out during setup.
+  const hasAllowedTier =
+    allowedTiers.length === 0
+      ? active
+      : active && userTierIds.some((id) => allowedTiers.includes(id));
+
+  if (!hasAllowedTier) {
     return redirect(`${url.origin}/denied.html?e=tier`);
   }
 
@@ -64,7 +84,7 @@ export async function onRequestGet({ request, env }) {
   const userId = me.data?.id || "unknown";
   const name = me.data?.attributes?.full_name || "Member";
   const session = await signSession(
-    { uid: userId, name, cents },
+    { uid: userId, name, tiers: userTierIds },
     env.SESSION_SECRET,
     60 * 60 * 24 * 7
   );

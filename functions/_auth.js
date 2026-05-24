@@ -2,13 +2,20 @@
 // Used by all /api functions running on Cloudflare Pages.
 
 const enc = new TextEncoder();
+const dec = new TextDecoder();
+// base64url from raw bytes (ArrayBuffer/Uint8Array)
 const b64url = (buf) =>
   btoa(String.fromCharCode(...new Uint8Array(buf)))
     .replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
-const b64urlStr = (str) =>
-  btoa(str).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
-const fromB64url = (s) =>
-  atob(s.replace(/-/g, "+").replace(/_/g, "/"));
+// base64url from a STRING — UTF-8 encode first so Unicode (ş, ğ, ü, ı, …) is safe.
+const b64urlStr = (str) => b64url(enc.encode(str));
+// decode a base64url STRING back to its original UTF-8 text
+const fromB64url = (s) => {
+  const bin = atob(s.replace(/-/g, "+").replace(/_/g, "/"));
+  const bytes = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+  return dec.decode(bytes);
+};
 
 // ---- HMAC-SHA256 signed token (a minimal JWT) ----
 async function hmacKey(secret) {

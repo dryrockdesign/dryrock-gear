@@ -6,13 +6,26 @@
 body{margin:0;background:#f4f1ea;color:#1a1c1f;font-family:'IBM Plex Sans',sans-serif;
   display:grid;place-items:center;min-height:100vh;text-align:center;
   background-image:linear-gradient(rgba(46,82,102,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(46,82,102,.035) 1px,transparent 1px);background-size:28px 28px}
-.card{max-width:460px;padding:40px}
+.card{max-width:480px;padding:40px}
+img{height:80px;width:auto;margin-bottom:20px;opacity:.9}
 h1{font-family:'Spectral',serif;font-weight:600;color:#b4541f;font-size:30px;margin:0 0 14px}
 p{color:#4a4f57;line-height:1.7;font-weight:300}
 a{color:#b4541f;text-decoration:none;font-weight:500}a:hover{text-decoration:underline}
 .links{margin-top:24px;font-family:'IBM Plex Mono',monospace;font-size:13px}
+.diag{margin-top:26px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#9aa0aa;
+  border-top:1px solid #e6e2d8;padding-top:14px}
 </style></head><body>
-<div class="card"><img src="/assets/logo.png" alt="Dryrock Design" style="height:80px;width:auto;margin-bottom:20px;opacity:.9"><h1>Access denied</h1>
-<p>We couldn't verify an active membership for your account. If you've just joined, wait a minute and try again, or check that your pledge is active.</p>
+<div class="card">
+<img src="/assets/logo.png" alt="Dryrock Design">
+<h1>Access denied</h1>
+<p>We couldn't verify an active membership for your account. If you've just joined or changed tier, wait a minute and try again, or check that your pledge is active.</p>
 <div class="links"><a href="/api/login">Try sign-in again</a> &middot; <a href="https://www.patreon.com/dryrockdesign">Join / manage membership</a></div>
-</div></body></html>
+<div class="diag" id="diag"></div>
+</div>
+<script>
+  // Show the technical reason (helps diagnose during setup; harmless to members).
+  var p=new URLSearchParams(location.search);
+  var e=p.get('e'), m=p.get('m');
+  if(e){ document.getElementById('diag').textContent='reason: '+e+(m?(' — '+decodeURIComponent(m)):''); }
+</script>
+</body></html>

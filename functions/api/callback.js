@@ -92,8 +92,10 @@ export async function onRequestGet({ request, env }) {
       },
     });
   } catch (err) {
-    // Never crash. Surface a short reason so we can diagnose from the URL.
-    const msg = encodeURIComponent(String((err && err.message) || err).slice(0, 120));
+    // Never crash. Surface reason + first stack line so we can pinpoint the source.
+    const base = String((err && err.message) || err);
+    const stack = String((err && err.stack) || "").split("\n")[1] || "";
+    const msg = encodeURIComponent((base + " @ " + stack).slice(0, 200));
     return redirect(`${url.origin}/denied.html?e=exception&m=${msg}`);
   }
 }

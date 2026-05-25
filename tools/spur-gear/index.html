@@ -134,16 +134,16 @@
       <div class="sec">
         <div class="sec-title">Gear Geometry</div>
         <div class="field"><div class="field-row"><label>Module m</label><span class="val" id="v-module">2.0</span></div>
-          <input type="range" id="module" min="0.5" max="6" step="0.1" value="2">
+          <input type="range" id="module" min="0.3" max="12" step="0.1" value="2">
           <div class="desc">Tooth size index (mm). Pitch Ø = m·z. Larger module = stronger, coarser teeth. Plastic gears favour m ≥ 1.</div></div>
         <div class="field"><div class="field-row"><label>Pinion teeth z₁</label><span class="val" id="v-teeth">18</span></div>
-          <input type="range" id="teeth" min="6" max="80" step="1" value="18">
+          <input type="range" id="teeth" min="5" max="200" step="1" value="18">
           <div class="desc">Tooth count of the driving (smaller) gear. Below ~17 (20° PA) undercut occurs — use positive profile shift.</div></div>
         <div class="field pair-only"><div class="field-row"><label>Gear teeth z₂</label><span class="val" id="v-teeth2">54</span></div>
-          <input type="range" id="teeth2" min="6" max="200" step="1" value="54">
+          <input type="range" id="teeth2" min="5" max="300" step="1" value="54">
           <div class="desc">Tooth count of the driven gear. Reduction ratio i = z₂ / z₁.</div></div>
         <div class="field"><div class="field-row"><label>Face width b</label><span class="val" id="v-fw">12.0</span></div>
-          <input type="range" id="fw" min="2" max="40" step="0.5" value="12">
+          <input type="range" id="fw" min="1" max="100" step="0.5" value="12">
           <div class="desc">Axial tooth length (mm). Wider face → lower stress. Typical b ≈ (6–12)·m.</div></div>
         <div class="field"><div class="field-row"><label>Root fillet ρ (×m)</label><span class="val" id="v-fillet">0.38</span></div>
           <input type="range" id="fillet" min="0" max="0.45" step="0.01" value="0.38">
@@ -196,23 +196,23 @@
         <div class="field"><div class="field-row"><label>Bore type</label></div>
           <select id="boreType"><option value="round">Round (plain)</option><option value="d">D-profile (flat)</option><option value="key">Keyway (DIN 6885)</option><option value="hex">Hex socket</option><option value="none">No bore</option></select></div>
         <div class="field"><div class="field-row"><label>Shaft Ø (mm)</label><span class="val" id="v-bore">6.0</span></div>
-          <input type="range" id="bore" min="2" max="40" step="0.5" value="6">
+          <input type="range" id="bore" min="1" max="100" step="0.5" value="6">
           <div class="desc">Nominal shaft diameter the gear mounts on.</div></div>
         <div class="field adv"><div class="field-row"><label>Fit clearance (mm, radial) <span class="badge-adv">ADV</span></label></div><input type="number" id="fit" value="0.2" step="0.05">
           <div class="desc">Radial clearance added to the printed bore for a slip/press fit. Applied to both gears.</div></div>
         <div class="field bore-d"><div class="field-row"><label>Flat distance from centre (mm)</label><span class="val" id="v-dflat">2.0</span></div>
-          <input type="range" id="dflat" min="0.5" max="20" step="0.1" value="2">
+          <input type="range" id="dflat" min="0.5" max="40" step="0.1" value="2">
           <div class="desc">Centre-to-flat of the D. Smaller = deeper flat = more torque key.</div></div>
         <div class="field bore-key"><div class="field-row"><label>Keyway <span class="badge-adv">DIN 6885-1</span></label></div>
           <div class="desc" id="keyInfo">Key width b and hub depth t₂ auto-selected from shaft Ø per DIN 6885-1.</div></div>
         <div class="field bore-key adv"><div class="field-row"><label>Key width override (mm) <span class="badge-adv">ADV</span></label></div><input type="number" id="keyW" value="0" step="0.5"><div class="desc">0 = use DIN auto value.</div></div>
         <div class="field bore-key adv"><div class="field-row"><label>Hub keyway depth t₂ override (mm) <span class="badge-adv">ADV</span></label></div><input type="number" id="keyT" value="0" step="0.1"></div>
         <div class="field bore-hex"><div class="field-row"><label>Across-flats AF (mm)</label><span class="val" id="v-hex">5.0</span></div>
-          <input type="range" id="hexAF" min="2" max="30" step="0.5" value="5"></div>
+          <input type="range" id="hexAF" min="2" max="60" step="0.5" value="5"></div>
         <div class="field adv"><div class="field-row"><label>Extended hub boss <span class="badge-adv">ADV</span></label></div>
           <select id="hubOn"><option value="0">None</option><option value="1">Add boss (one face)</option></select></div>
-        <div class="field adv hub-on"><div class="field-row"><label>Boss Ø (mm)</label><span class="val" id="v-hubd">14.0</span></div><input type="range" id="hubD" min="5" max="60" step="0.5" value="14"></div>
-        <div class="field adv hub-on"><div class="field-row"><label>Boss length (mm)</label><span class="val" id="v-hubl">8.0</span></div><input type="range" id="hubL" min="1" max="40" step="0.5" value="8"></div>
+        <div class="field adv hub-on"><div class="field-row"><label>Boss Ø (mm)</label><span class="val" id="v-hubd">14.0</span></div><input type="range" id="hubD" min="5" max="120" step="0.5" value="14"></div>
+        <div class="field adv hub-on"><div class="field-row"><label>Boss length (mm)</label><span class="val" id="v-hubl">8.0</span></div><input type="range" id="hubL" min="1" max="80" step="0.5" value="8"></div>
       </div>
 
       <div class="sec adv">

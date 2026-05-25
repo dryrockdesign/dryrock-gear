@@ -7,7 +7,7 @@
 <meta name="description" content="Engineering design tools for makers. Polymer gear design, shaft analysis and more — built on real engineering standards, made simple.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=DM+Sans:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
   :root{
     --ink:#1a1c1f; --ink-soft:#4a4f57; --ink-faint:#878d97;
@@ -19,7 +19,7 @@
   html{scroll-behavior:smooth}
   body{
     background:var(--paper);color:var(--ink);
-    font-family:'IBM Plex Sans',sans-serif;font-weight:400;line-height:1.6;
+    font-family:'DM Sans',sans-serif;font-weight:400;line-height:1.6;
     -webkit-font-smoothing:antialiased;
     background-image:linear-gradient(rgba(46,82,102,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(46,82,102,.035) 1px,transparent 1px);
     background-size:28px 28px;
@@ -29,21 +29,21 @@
   .nav{display:flex;align-items:center;justify-content:space-between;height:68px}
   .brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--ink)}
   .logo-img{height:44px;width:auto;display:block}
-  .brand-text{font-family:'Spectral',serif;font-weight:600;font-size:18px;letter-spacing:.2px;line-height:1}
-  .brand-text small{display:block;font-family:'IBM Plex Mono',monospace;font-weight:400;font-size:9.5px;letter-spacing:2.5px;text-transform:uppercase;color:var(--ink-faint);margin-top:3px}
+  .brand-text{font-family:'Fraunces',serif;font-weight:600;font-size:18px;letter-spacing:.2px;line-height:1}
+  .brand-text small{display:block;font-family:'Space Mono',monospace;font-weight:400;font-size:9.5px;letter-spacing:2.5px;text-transform:uppercase;color:var(--ink-faint);margin-top:3px}
   .nav-links{display:flex;align-items:center;gap:28px}
   .nav-links a{color:var(--ink-soft);text-decoration:none;font-size:14px;font-weight:500;transition:color .15s}
   .nav-links a:hover{color:var(--rust)}
   .nav-cta{background:var(--ink);color:var(--paper);padding:9px 18px;border-radius:3px;font-size:13px;font-weight:500;letter-spacing:.3px;transition:background .15s}
   .nav-cta:hover{background:var(--rust)!important;color:#fff!important}
   .hero{padding:78px 0 64px;position:relative}
-  .hero .eyebrow{font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:3px;text-transform:uppercase;color:var(--rust);margin-bottom:22px;display:flex;align-items:center;gap:12px}
+  .hero .eyebrow{font-family:'Space Mono',monospace;font-size:12px;letter-spacing:3px;text-transform:uppercase;color:var(--rust);margin-bottom:22px;display:flex;align-items:center;gap:12px}
   .hero .eyebrow::before{content:"";width:36px;height:1px;background:var(--rust)}
-  .hero h1{font-family:'Spectral',serif;font-weight:600;font-size:clamp(38px,6vw,62px);line-height:1.08;letter-spacing:-.5px;max-width:16ch;margin-bottom:24px}
+  .hero h1{font-family:'Fraunces',serif;font-weight:600;font-size:clamp(38px,6vw,62px);line-height:1.08;letter-spacing:-.5px;max-width:16ch;margin-bottom:24px}
   .hero h1 em{font-style:italic;color:var(--rust);font-weight:500}
   .hero .lead{font-size:18px;color:var(--ink-soft);max-width:54ch;font-weight:300;line-height:1.7}
   .hero-actions{display:flex;gap:14px;margin-top:36px;flex-wrap:wrap}
-  .btn{font-family:'IBM Plex Sans',sans-serif;font-size:15px;font-weight:500;padding:14px 28px;border-radius:3px;text-decoration:none;cursor:pointer;border:1px solid transparent;transition:all .15s;letter-spacing:.2px}
+  .btn{font-family:'DM Sans',sans-serif;font-size:15px;font-weight:500;padding:14px 28px;border-radius:3px;text-decoration:none;cursor:pointer;border:1px solid transparent;transition:all .15s;letter-spacing:.2px}
   .btn-primary{background:var(--rust);color:#fff}
   .btn-primary:hover{background:#9c4619;transform:translateY(-1px)}
   .btn-ghost{background:transparent;color:var(--ink);border-color:var(--line)}
@@ -51,8 +51,8 @@
   .hero-deco{position:absolute;top:24px;right:-30px;width:300px;height:300px;opacity:.08;pointer-events:none}
   section{padding:64px 0}
   .sec-head{margin-bottom:40px;max-width:62ch}
-  .sec-head .label{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--ink-faint);margin-bottom:14px}
-  .sec-head h2{font-family:'Spectral',serif;font-weight:600;font-size:32px;letter-spacing:-.3px;margin-bottom:12px}
+  .sec-head .label{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--ink-faint);margin-bottom:14px}
+  .sec-head h2{font-family:'Fraunces',serif;font-weight:600;font-size:32px;letter-spacing:-.3px;margin-bottom:12px}
   .sec-head p{color:var(--ink-soft);font-size:16px;font-weight:300}
   .divider{border:none;border-top:1px solid var(--line);margin:0}
   .tools-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:22px}
@@ -61,37 +61,37 @@
   .tool-card .thumb{height:150px;background:var(--blueprint);position:relative;overflow:hidden;display:grid;place-items:center}
   .tool-card .thumb svg{width:100%;height:100%;display:block}
   .tool-card .body{padding:22px 22px 24px;display:flex;flex-direction:column;flex:1}
-  .tool-card .tag{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--rust);margin-bottom:9px}
-  .tool-card h3{font-family:'Spectral',serif;font-weight:600;font-size:21px;margin-bottom:9px;letter-spacing:-.2px}
+  .tool-card .tag{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--rust);margin-bottom:9px}
+  .tool-card h3{font-family:'Fraunces',serif;font-weight:600;font-size:21px;margin-bottom:9px;letter-spacing:-.2px}
   .tool-card p{color:var(--ink-soft);font-size:14px;font-weight:300;line-height:1.6;flex:1;margin-bottom:18px}
   .tool-card .card-foot{display:flex;align-items:center;justify-content:space-between}
-  .tool-card .launch{font-family:'IBM Plex Sans',sans-serif;font-size:14px;font-weight:500;color:var(--paper);background:var(--ink);padding:10px 20px;border-radius:3px;text-decoration:none;transition:background .15s;border:none;cursor:pointer}
+  .tool-card .launch{font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;color:var(--paper);background:var(--ink);padding:10px 20px;border-radius:3px;text-decoration:none;transition:background .15s;border:none;cursor:pointer}
   .tool-card .launch:hover{background:var(--rust)}
-  .tool-card .lock{font-size:11px;color:var(--ink-faint);font-family:'IBM Plex Mono',monospace;letter-spacing:.5px}
-  .badge-soon{position:absolute;top:14px;right:14px;background:rgba(26,28,31,.82);color:var(--paper);font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;padding:4px 9px;border-radius:3px;z-index:2}
+  .tool-card .lock{font-size:11px;color:var(--ink-faint);font-family:'Space Mono',monospace;letter-spacing:.5px}
+  .badge-soon{position:absolute;top:14px;right:14px;background:rgba(26,28,31,.82);color:var(--paper);font-family:'Space Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;padding:4px 9px;border-radius:3px;z-index:2}
   .tool-card.soon{opacity:.72}
   .tool-card.soon .launch{background:var(--line);color:var(--ink-faint);cursor:not-allowed;pointer-events:none}
   .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:28px}
   .step{position:relative;padding-top:18px;border-top:2px solid var(--ink)}
-  .step .num{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--rust);letter-spacing:2px;margin-bottom:10px}
-  .step h4{font-family:'Spectral',serif;font-weight:600;font-size:18px;margin-bottom:8px}
+  .step .num{font-family:'Space Mono',monospace;font-size:12px;color:var(--rust);letter-spacing:2px;margin-bottom:10px}
+  .step h4{font-family:'Fraunces',serif;font-weight:600;font-size:18px;margin-bottom:8px}
   .step p{color:var(--ink-soft);font-size:14px;font-weight:300}
   .video-frame{border:1px solid var(--line);border-radius:6px;background:var(--paper-2);aspect-ratio:16/9;display:grid;place-items:center;position:relative;overflow:hidden}
   .video-frame::before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(46,82,102,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(46,82,102,.05) 1px,transparent 1px);background-size:22px 22px}
   .video-ph{text-align:center;position:relative;z-index:1}
   .video-ph .play{width:64px;height:64px;border-radius:50%;border:2px solid var(--ink-faint);display:grid;place-items:center;margin:0 auto 16px;color:var(--ink-faint)}
   .video-ph .play svg{width:22px;height:22px;margin-left:3px}
-  .video-ph p{font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--ink-faint)}
+  .video-ph p{font-family:'Space Mono',monospace;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--ink-faint)}
   .join{background:var(--ink);color:var(--paper);border-radius:8px;padding:54px 48px;text-align:center;position:relative;overflow:hidden}
   .join::before{content:"";position:absolute;inset:0;opacity:.06;background-image:linear-gradient(#fff 1px,transparent 1px),linear-gradient(90deg,#fff 1px,transparent 1px);background-size:30px 30px}
-  .join h2{font-family:'Spectral',serif;font-weight:600;font-size:30px;margin-bottom:14px;position:relative}
+  .join h2{font-family:'Fraunces',serif;font-weight:600;font-size:30px;margin-bottom:14px;position:relative}
   .join p{color:#c9c5bc;font-weight:300;max-width:50ch;margin:0 auto 28px;position:relative}
   .join .btn-primary{position:relative}
-  .join .note{margin-top:18px;font-size:12.5px;color:#8b9099;font-family:'IBM Plex Mono',monospace;letter-spacing:.5px;position:relative}
+  .join .note{margin-top:18px;font-size:12.5px;color:#8b9099;font-family:'Space Mono',monospace;letter-spacing:.5px;position:relative}
   footer{border-top:1px solid var(--line);padding:40px 0;margin-top:20px}
   .foot-grid{display:flex;justify-content:space-between;align-items:flex-start;gap:30px;flex-wrap:wrap}
-  .foot-brand{font-family:'Spectral',serif;font-weight:600;font-size:16px}
-  .foot-brand small{display:block;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--ink-faint);margin-top:6px;font-weight:400}
+  .foot-brand{font-family:'Fraunces',serif;font-weight:600;font-size:16px}
+  .foot-brand small{display:block;font-family:'Space Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--ink-faint);margin-top:6px;font-weight:400}
   .foot-links{display:flex;gap:24px;flex-wrap:wrap}
   .foot-links a{color:var(--ink-soft);text-decoration:none;font-size:13px}
   .foot-links a:hover{color:var(--rust)}
@@ -101,6 +101,33 @@
     .steps{grid-template-columns:1fr;gap:22px}
     .hero{padding:54px 0 44px}.join{padding:40px 24px}.hero-deco{display:none}
   }
+  /* ---- capabilities section ---- */
+  .cap-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px;margin-top:8px}
+  .cap{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:24px}
+  .cap .ic{width:40px;height:40px;border:1.5px solid var(--rust);border-radius:5px;display:grid;place-items:center;margin-bottom:14px;color:var(--rust)}
+  .cap .ic svg{width:22px;height:22px}
+  .cap h4{font-family:'Fraunces',serif;font-weight:600;font-size:17px;margin-bottom:8px}
+  .cap p{color:var(--ink-soft);font-size:13.5px;font-weight:400;line-height:1.6}
+  .cap ul{margin:10px 0 0;padding-left:0;list-style:none}
+  .cap li{color:var(--ink-soft);font-size:13px;line-height:1.7;padding-left:18px;position:relative}
+  .cap li::before{content:"›";position:absolute;left:2px;color:var(--rust);font-weight:700}
+  .spec-band{background:var(--ink);color:var(--paper);border-radius:8px;padding:32px 36px;margin-top:30px;position:relative;overflow:hidden}
+  .spec-band::before{content:"";position:absolute;inset:0;opacity:.05;background-image:linear-gradient(#fff 1px,transparent 1px),linear-gradient(90deg,#fff 1px,transparent 1px);background-size:26px 26px}
+  .spec-band h4{font-family:'Fraunces',serif;font-weight:600;font-size:15px;letter-spacing:.5px;margin-bottom:18px;position:relative;color:#fff}
+  .spec-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px 28px;position:relative}
+  .spec-list div{font-family:'Space Mono',monospace;font-size:12.5px;color:#c9c5bc;display:flex;gap:8px;align-items:baseline}
+  .spec-list div::before{content:"▪";color:var(--rust-soft);font-size:10px}
+
+  /* ---- subscription guide ---- */
+  .guide-steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px;counter-reset:gs}
+  .gstep{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:24px 22px;position:relative;counter-increment:gs}
+  .gstep::before{content:counter(gs);position:absolute;top:-14px;left:22px;width:30px;height:30px;background:var(--rust);color:#fff;border-radius:50%;display:grid;place-items:center;font-family:'Fraunces',serif;font-weight:700;font-size:14px}
+  .gstep h4{font-family:'Fraunces',serif;font-weight:600;font-size:16px;margin:10px 0 8px}
+  .gstep p{color:var(--ink-soft);font-size:13.5px;font-weight:400;line-height:1.6}
+  .gstep a{color:var(--rust);text-decoration:none;font-weight:600;word-break:break-word}
+  .gstep a:hover{text-decoration:underline}
+  .guide-cta{margin-top:28px;text-align:center}
+  .tier-tag{display:inline-block;font-family:'Space Mono',monospace;font-size:12px;background:var(--paper-2);border:1px solid var(--line);border-radius:4px;padding:3px 9px;color:var(--ink);margin:2px}
 </style>
 </head>
 <body>
@@ -112,8 +139,8 @@
     </a>
     <nav class="nav-links">
       <a href="#tools">Tools</a>
-      <a href="#how">How it works</a>
-      <a href="#video">Guide</a>
+      <a href="#capabilities">Features</a>
+      <a href="#join-guide">How to join</a>
       <a class="nav-cta" href="/tools/spur-gear">Launch app &rarr;</a>
     </nav>
   </div>
@@ -256,7 +283,145 @@
 
 <hr class="divider">
 
-<section id="video">
+<!-- ================= CAPABILITIES (what the tool actually does) ================= -->
+<section id="capabilities">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="label">Inside the Spur Gear Designer</div>
+      <h2>What it actually calculates</h2>
+      <p>This isn't a shape generator that just draws a gear. It runs the real polymer-gear engineering checks from the VDI 2736 standard, so the part you print is one you can actually trust under load.</p>
+    </div>
+
+    <div class="cap-grid">
+      <div class="cap">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/></svg></div>
+        <h4>Gear geometry</h4>
+        <p>Define a true involute gear from the parameters that matter:</p>
+        <ul>
+          <li>Module, number of teeth, pressure angle</li>
+          <li>Profile shift (x) for stronger or fitted gears</li>
+          <li>Root fillet radius &amp; tip/root diameters</li>
+          <li>Single gear or a meshing pair with ratio</li>
+        </ul>
+      </div>
+
+      <div class="cap">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 3v18h18"/><path d="M7 14l3-4 3 2 4-6"/></svg></div>
+        <h4>Strength &amp; safety (VDI 2736)</h4>
+        <p>The core engineering verification for plastic gears:</p>
+        <ul>
+          <li>Tooth-root bending stress (&sigma;<sub>F</sub>)</li>
+          <li>Flank / contact pressure (&sigma;<sub>H</sub>, Hertzian)</li>
+          <li>Safety factors S<sub>F</sub> and S<sub>H</sub></li>
+          <li>Pass / fail verdict for your load case</li>
+        </ul>
+      </div>
+
+      <div class="cap">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 2a7 7 0 0 1 7 7c0 3-2 4-2 7H7c0-3-2-4-2-7a7 7 0 0 1 7-7z"/><path d="M9 21h6"/></svg></div>
+        <h4>Thermal &amp; wear check</h4>
+        <p>Plastic gears fail from heat, not just force:</p>
+        <ul>
+          <li>Flash &amp; bulk tooth temperature estimate</li>
+          <li>PV (pressure &times; velocity) loading</li>
+          <li>Indicative wear &amp; service-life guidance</li>
+          <li>Warns when a material runs too hot</li>
+        </ul>
+      </div>
+
+      <div class="cap">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 7l9-4 9 4-9 4-9-4z"/><path d="M3 7v10l9 4 9-4V7"/></svg></div>
+        <h4>Material library</h4>
+        <p>Pick your real printing filament &mdash; properties are built in:</p>
+        <ul>
+          <li>POM, PA66, PA12, PA-CF, PETG, ABS, PLA, PC, TPU</li>
+          <li>Custom material option for your own data</li>
+          <li>Print-strength derating for FDM parts</li>
+        </ul>
+      </div>
+
+      <div class="cap">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/></svg></div>
+        <h4>Hub, bore &amp; fit</h4>
+        <p>Make it a real, mountable part:</p>
+        <ul>
+          <li>Round bore, D-flat, keyway (DIN 6885-1) or hex</li>
+          <li>Hub diameter &amp; length</li>
+          <li>Clearance / fit allowance for printed parts</li>
+        </ul>
+      </div>
+
+      <div class="cap">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 3v12m0 0l-4-4m4 4l4-4"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg></div>
+        <h4>Exports you can use</h4>
+        <p>Take your verified design straight to the bench:</p>
+        <ul>
+          <li>Print-ready <strong>STL</strong> (generated on our server)</li>
+          <li>Full <strong>PDF</strong> engineering report of every result</li>
+          <li>Save / load your design as a config file</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="spec-band">
+      <h4>Also included</h4>
+      <div class="spec-list">
+        <div>Live 3D preview &amp; mesh animation</div>
+        <div>Working pressure angle &amp; centre distance</div>
+        <div>Contact ratio calculation</div>
+        <div>Pair kinematics: torque, speed, efficiency</div>
+        <div>Profile-shift optimiser (balances root safety)</div>
+        <div>Basic &amp; Advanced input modes</div>
+      </div>
+    </div>
+
+    <p style="margin-top:22px;font-size:13px;color:var(--ink-faint);font-family:'Space Mono',monospace;line-height:1.7">
+      Core gear geometry &amp; VDI 2736 stress results are calculated precisely. Thermal, PV and wear figures are indicative guidance &mdash; for critical or load-bearing parts, confirm with physical testing.
+    </p>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ================= SUBSCRIPTION GUIDE ================= -->
+<section id="join-guide">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="label">Getting access</div>
+      <h2>How to subscribe &amp; sign in</h2>
+      <p>Access is handled through Patreon. It takes about two minutes &mdash; here's exactly how, step by step.</p>
+    </div>
+
+    <div class="guide-steps">
+      <div class="gstep">
+        <h4>Go to Patreon</h4>
+        <p>Open <a href="https://www.patreon.com/dryrockdesign" target="_blank" rel="noopener">patreon.com/dryrockdesign</a> in your web browser. Tip: join from a browser (not the phone app) to avoid Apple's extra 30% fee.</p>
+      </div>
+      <div class="gstep">
+        <h4>Pick the right tier</h4>
+        <p>Choose a tier that includes the tools:</p>
+        <p><span class="tier-tag">All Designs + Engineering Tools</span> <span class="tier-tag">Commercial License</span></p>
+        <p>Either one unlocks every tool on this site.</p>
+      </div>
+      <div class="gstep">
+        <h4>Complete your pledge</h4>
+        <p>Finish the Patreon checkout so your membership is <strong>active</strong>. Discounts, promos or gift codes are fine &mdash; access follows the tier, not the price you paid.</p>
+      </div>
+      <div class="gstep">
+        <h4>Come back &amp; sign in</h4>
+        <p>Return to <a href="https://www.dryrockdesigntools.com" target="_blank" rel="noopener">dryrockdesigntools.com</a>, open any tool and click <strong>Sign in with Patreon</strong>. Approve once, and the tool opens.</p>
+      </div>
+    </div>
+
+    <div class="guide-cta">
+      <a class="btn btn-primary" href="https://www.patreon.com/dryrockdesign" target="_blank" rel="noopener">Become a member on Patreon &rarr;</a>
+    </div>
+
+    <p style="margin-top:22px;font-size:13px;color:var(--ink-faint);font-family:'Space Mono',monospace;line-height:1.7;text-align:center">
+      Already a member? Just open a tool and click "Sign in with Patreon". · Just joined and still blocked? Wait a minute for Patreon to activate, then try again.
+    </p>
+  </div>
+</section>
   <div class="wrap">
     <div class="sec-head">
       <div class="label">Watch the guide</div>

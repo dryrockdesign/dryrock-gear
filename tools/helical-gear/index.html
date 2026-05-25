@@ -439,8 +439,11 @@ function geomsFor(p,teeth,x,handed){
   const totalTwist=sign*(b*Math.tan(beta))/r;          // helix twist over face width
   const steps=Math.max(8,Math.min(48,Math.round(Math.abs(totalTwist)/(Math.PI/60))+8));
   const g=new THREE.ExtrudeGeometry(shape,{depth:b,bevelEnabled:false,steps});
-  const boreR=p.boreType==='none'?0:(p.bore/2+(p.fit||0));
-  const rIn=boreR*1.15+0.5, rOut=Math.max(rIn+1.0,r*0.85);
+  let boreR=0;
+  if(p.boreType!=='none'){const bp=(p.boreType==='round')?null:borePoints(p.boreType,p);
+    if(bp&&bp.length){for(const q of bp){const rr=Math.hypot(q[0],q[1]);if(rr>boreR)boreR=rr;}}else boreR=p.bore/2+(p.fit||0);}
+  const mn=p.module,rRoot=r-1.25*mn;
+  const rIn=Math.min(boreR*1.12+0.5,rRoot-0.5),rOut=Math.max(rIn+1.2,rRoot);
   applyTwist(g,b,totalTwist,rIn,rOut);
   g.translate(0,0,-b/2);g.rotateX(-Math.PI/2);geoms.push(g);
   if(p.hubOn==='1'&&p.boreType!=='none'&&p.hubD>(p.bore+2*p.fit)+1){
